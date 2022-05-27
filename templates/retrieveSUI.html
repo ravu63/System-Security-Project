@@ -1,0 +1,13 @@
+{% extends "baseMain.html" %}
+{% block title %}Pawn- Retrieve Status{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %} 
+<h3>Retrieve Status</h3>
+<form method="POST" action="">
+    <div class="form-group">
+        {{ render_field(form.SUI_CODE, class="form-control",style="width:20%") }}
+      </div>
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+</form>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Radiant Finance - Manage Customers{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Manage Customers</h1>
+<a href="/searchCustomer">Search Customer</a>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>BirthDate</th>
+        <th>gender</th>
+        <th>Phone Number</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in customers_list %}
+      {%if customer.get_role()==0%}
+        <tr>
+
+          <td>{{ customer.get_name() }}</td>
+          <td>{{ customer.get_email() }}</td>
+          <td>{{customer.get_birthdate()}}</td>
+          {% if customer.get_gender() == "F" %}
+            <td>Female</td>
+          {% elif customer.get_gender() == "M" %}
+            <td>Male</td>
+          {% endif %}
+          <td>{{customer.get_phone()}}</td>
+
+          <td>
+            <form action="{{url_for('delete_customer', id=customer.get_email())}}" method="POST">
+
+          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{customer.get_email()}}">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
+
+            </form>
+          </td>
+        </tr>
+        {%endif%}
+      {% endfor %}
+
+    </tbody>
+  </table>
+</div>
+{% endblock %}

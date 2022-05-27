@@ -1,0 +1,58 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/main"><img src="static/img/logo.png" alt=""></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Pawn</a>
+              <ul class="dropdown-menu">
+                <li> <a class="dropdown-item" href="/createPawn">Create Pawn</a></li>
+                <li><a class="dropdown-item" href="/retrieveStatus">Status Check</a></li>
+              </ul>
+        </li>
+        <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Money Exchanger</a>
+              <ul class="dropdown-menu">
+                <li> <a class="dropdown-item" href="/moneyExchange">Create</a></li>
+                  <li><a class="dropdown-item" href="/CurrencyRequest">Currency Request</a></li>
+              </ul>
+        </li>
+         <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Loan</a>
+              <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="/Loan.html">Create Loan</a></li>
+              </ul>
+        </li>
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Account Management</a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/manageAccount/{{session.get('id')}}">Manage Account</a></li>
+                  <li><a class="dropdown-item" href="/changePassword/{{session.get('id')}}">Change Password</a></li>
+                   <li><a class="dropdown-item" href="/feedback/{{session.get('id')}}">Feedback</a></li>
+                  <li><a class="dropdown-item" href="/viewFeedback/{{session.get('id')}}">View Feedback</a></li>
+              </ul>
+        </li>
+      </ul>
+        <ul class = "like">
+        <div class = "Loke">
+          <li class="nav-item">
+              <a class="nav-link" href="/logout">Log Out</a>
+          </li>
+        </div>
+        </ul>
+    </div>
+  </div>
+</nav>
+
+<style>
+.like {
+                display: flex;
+                flex-direction: column;
+                margin-left: auto;
+                margin-bottom: 0;
+                list-style: none;
+        }
+</style>

@@ -1,0 +1,13 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Pawn- Update Status{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %} 
+<h1 class="display-4">Update Status</h1>
+<form method="POST" action="">
+    <div class="form-group">
+        {{ render_field(form.pawn_status, class="form-control") }}
+      </div>
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+</form>
+{% endblock %}

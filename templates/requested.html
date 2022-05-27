@@ -1,0 +1,31 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Radiant Finance - Manage Feedback{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Currency Request</h1>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Contact Number</th>
+        <th>Email</th>
+        <th>Currency Requested</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for feedback in feedback1_list %}
+        <tr>
+           <td>{{ feedback.get_name() }}</td>
+          <td>{{ feedback.get_contactnumber() }}</td>
+          <td>{{feedback.get_email()}}</td>
+          <td>{{feedback.get_currency()}}</td>
+        </tr>
+      {% endfor %}
+
+    </tbody>
+  </table>
+</div>
+{% endblock %}

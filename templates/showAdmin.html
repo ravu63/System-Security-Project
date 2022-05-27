@@ -1,0 +1,82 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Radiant Finance - Show Admin{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Manage Admin</h1>
+{% if count == 0 %}
+  <p>There are no customers.</p>
+  {% elif count == 1 %}
+  <p>There is 1 customer.</p>
+  {% else %}
+  <p>There are {{ count }} customers.</p>
+  {% endif %}
+<a href="/searchCustomer">Search</a>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>BirthDate</th>
+        <th>gender</th>
+        <th>Phone Number</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in customer_list %}
+        <tr>
+          <td>{{ customer.get_name() }}</td>
+          <td>{{ customer.get_email() }}</td>
+          <td>{{customer.get_birthdate()}}</td>
+          {% if customer.get_gender() == "F" %}
+            <td>Female</td>
+          {% elif customer.get_gender() == "M" %}
+            <td>Male</td>
+          {% endif %}
+          <td>{{customer.get_phone()}}</td>
+
+          <td><a href="/updateCustomer/{{customer.get_email()}}" class="btn btn-warning">Update</a></td>
+          <td>
+            <form action="{{url_for('delete_customer', id=customer.get_email())}}" method="POST">
+
+          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{customer.get_email()}}">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
+
+          <!-- The Modal -->
+          <div class="modal" id="myModal_{{customer.get_email()}}">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">Delete Confirmation</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                  Are you sure you want to delete {{customer.get_name}}?
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <input type="submit" value="Delete" class="btn btn-danger">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                </div>
+
+              </div>
+            </div>
+</div>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+
+    </tbody>
+  </table>
+</div>
+{% endblock %}

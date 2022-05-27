@@ -1,0 +1,48 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Radiant Finance - Manage Feedback{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Customer Feedback</h1>
+<a href="/searchCustomer">Search</a>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Service Rating</th>
+        <th>Website Rating</th>
+        <th>Additional Feedback</th>
+        <th>Date Created</th>
+        <th>Status</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for feedback in feedback_list %}
+        <tr>
+           <td>{{ feedback.get_name() }}</td>
+          <td>{{ feedback.get_email() }}</td>
+          <td>{{feedback.get_service()}}</td>
+          <td>{{feedback.get_website()}}</td>
+            <td>{{feedback.get_additional()}}</td>
+          <td>{{feedback.get_date()}}</td>
+          <td>{{feedback.get_status()}}</td>
+           <td><a href="/updateFeedback/{{feedback.get_email()}}" class="btn btn-warning">Update</a></td>
+          <td>
+            <form action="{{url_for('delete_feedback', id=feedback.get_email())}}" method="POST">
+
+          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{feedback.get_email()}}">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
+
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+
+    </tbody>
+  </table>
+</div>
+{% endblock %}

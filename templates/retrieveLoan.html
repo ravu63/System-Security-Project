@@ -1,0 +1,47 @@
+{% extends "baseMain.html" %}
+{% block title %}Library Loan System - Retrieve Users{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Retrieve Loans</h1>
+<div>
+    {% if count == 0 %}
+    <p>There are no Loans.</p>
+    {% elif count == 1 %}
+    <p>There is 1 Loan.</p>
+    {% else %}
+    <p>There are {{ count }} Loans.</p>
+    {% endif %}
+</div>
+<div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Email</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for Loan in loans_lists %}
+        <tr>
+            <td>{{ Loan.get_loan_id() }}</td>
+            <td>{{ Loan.get_loan_name() }}</td>
+            <td>{{ Loan.get_loan_amount() }}</td>
+            <td>{{ Loan.get_loan_email() }}</td>
+            <td><a href="/updateLoan.html/{{Loan.get_loan_id()}}" class="btn btn-warning">Update</a></td>
+            <td>
+                <form action="{{url_for('delete_loan', id=Loan.get_loan_id())}}" method="POST">
+                    <input type="submit" value="Delete" class="btn btn-danger">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+
+
+        </tbody>
+    </table>
+</div>
+{% endblock %}

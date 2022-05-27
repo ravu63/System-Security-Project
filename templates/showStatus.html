@@ -1,0 +1,29 @@
+{% extends "baseMain.html" %}
+{% block title %}Pawn- Retrieve Pawn{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %} 
+<h1>Retreive Status</h1>
+<div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+              <th>SUI</th>
+              <th>NRIC</th>
+              <th>Price</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pawn in pawns_list %}
+            <tr>
+                <td>{{ pawn.get_SUI() }}</td>
+                <td>{{ pawn.get_nric() }}</td>
+                <td>{{ pawn.get_offer_price() }}</td>
+                <td>{{ pawn.get_pawnstatus() }}</td>
+          </tbody>
+            </tr>
+        </table>
+    </div>
+    {% endfor %}
+{% endblock %}

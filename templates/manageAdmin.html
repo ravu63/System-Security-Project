@@ -1,0 +1,54 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Radiant Finance - Manage Admin{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Manage Admin</h1>
+
+<a href="/createAdmin">Create Admin</a>
+<a href="/searchAdmin">Search Admin</a>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>BirthDate</th>
+        <th>gender</th>
+        <th>Phone Number</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in customers_list %}
+      {%if customer.get_role()==1%}
+        <tr>
+
+          <td>{{ customer.get_name() }}</td>
+          <td>{{ customer.get_email() }}</td>
+          <td>{{customer.get_birthdate()}}</td>
+          {% if customer.get_gender() == "F" %}
+            <td>Female</td>
+          {% elif customer.get_gender() == "M" %}
+            <td>Male</td>
+          {% endif %}
+          <td>{{customer.get_phone()}}</td>
+
+          <td><a href="/updateAdmin/{{customer.get_email()}}" class="btn btn-warning">Update</a></td>
+          <td>
+            <form action="{{url_for('delete_admin', id=customer.get_email())}}" method="POST">
+
+          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{customer.get_email()}}">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
+
+
+            </form>
+          </td>
+        </tr>
+      {%endif%}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
