@@ -17,7 +17,7 @@ from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCusto
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from transaction import Transaction, CustomerPurchase
-from currency import Currency
+from Currency import Currency
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587

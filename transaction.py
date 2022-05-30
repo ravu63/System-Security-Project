@@ -1,4 +1,4 @@
-import currency
+import Currency
 
 class Transaction:
 
