@@ -17,7 +17,7 @@ from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCusto
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from transaction import Transaction, CustomerPurchase
-from currency import Currency
+from Currency import Currency
 import mysql.connector
 from mysql.connector.constants import ClientFlag
 app = Flask(__name__)
