@@ -18,6 +18,8 @@ from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCusto
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from transaction import Transaction, CustomerPurchase
 from currency import Currency
+import mysql.connector
+from mysql.connector.constants import ClientFlag
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -26,6 +28,28 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
 app.config['MAIL_PASSWORD'] = "Radiant12345"
+
+config = {
+    'user': 'root',
+    'password': 'Joshua!123',
+    'host': '34.87.141.130',
+    'client_flags': [ClientFlag.SSL],
+    'ssl_ca': 'ssl/server-ca.pem',
+    'ssl_cert': 'ssl/client-cert.pem',
+    'ssl_key': 'ssl/client-key.pem'
+}
+
+# now we establish our connection
+cnxn = mysql.connector.connect(**config)
+
+cursor = cnxn.cursor()  # initialize connection cursor
+cursor.execute('USE Finance')  # create a new 'testdb' database
+cnxn.close()  # close connection because we will be reconnecting to testdb
+
+
+config['database'] = 'Finance'  # add new database to config dict
+cnxn = mysql.connector.connect(**config)
+cursor = cnxn.cursor()
 
 mail = Mail(app)
 
