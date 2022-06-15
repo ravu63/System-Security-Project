@@ -20,6 +20,8 @@ from transaction import Transaction, CustomerPurchase
 from Currency import Currency
 import mysql.connector
 from mysql.connector.constants import ClientFlag
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -28,6 +30,20 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
 app.config['MAIL_PASSWORD'] = "Radiant12345"
+
+db=SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
+app.config['SECRET_KEY']='thisisasecretkey'
+
+class User(db.Model, UserMixin):
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String(20), nullable=False)
+    gender = db.Column(db.String(1), nullable=False)
+    phone = db.Column(db.String(8), nullable=False)
+    birthdate = db.Column(db.Date, nullable=False)
+    email = db.Column(db.String(30), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+
 
 config = {
     'user': 'root',
