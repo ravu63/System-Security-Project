@@ -18,8 +18,6 @@ from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCusto
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from transaction import Transaction, CustomerPurchase
 from Currency import Currency
-import mysql.connector
-from mysql.connector.constants import ClientFlag
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 app = Flask(__name__)
@@ -43,29 +41,7 @@ class User(db.Model, UserMixin):
     birthdate = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(100), nullable=False)
-
-
-config = {
-    'user': 'root',
-    'password': 'Joshua!123',
-    'host': '34.87.141.130',
-    'client_flags': [ClientFlag.SSL],
-    'ssl_ca': 'ssl/server-ca.pem',
-    'ssl_cert': 'ssl/client-cert.pem',
-    'ssl_key': 'ssl/client-key.pem'
-}
-
-# now we establish our connection
-cnxn = mysql.connector.connect(**config)
-
-cursor = cnxn.cursor()  # initialize connection cursor
-cursor.execute('USE Finance')  # create a new 'testdb' database
-cnxn.close()  # close connection because we will be reconnecting to testdb
-
-
-config['database'] = 'Finance'  # add new database to config dict
-cnxn = mysql.connector.connect(**config)
-cursor = cnxn.cursor()
+    role=db.Column(db.Integer, nullable=False)
 
 mail = Mail(app)
 
