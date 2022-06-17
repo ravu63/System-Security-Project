@@ -164,31 +164,13 @@ def create_admin():
 @app.route('/manageCustomer', methods=['GET', 'POST'])
 @login_required
 def manage_customers():
-    customers_dict = {}
-    db = shelve.open('signup.db', 'r')
-    customers_dict = db['Customers']
-    db.close()
-
-    customers_list = []
-    for key in customers_dict:
-        customer = customers_dict.get(key)
-        customers_list.append(customer)
-    return render_template('manageCustomer.html', count=len(customers_list), customers_list=customers_list)
+    return render_template('manageCustomer.html', Users=User.query.all())
 
 
 @app.route('/manageAdmin', methods=['GET', 'POST'])
 @login_required
 def manage_admin():
-    customers_dict = {}
-    db = shelve.open('signup.db', 'r')
-    customers_dict = db['Customers']
-    db.close()
-
-    customers_list = []
-    for key in customers_dict:
-        customer = customers_dict.get(key)
-        customers_list.append(customer)
-    return render_template('manageAdmin.html', count=len(customers_list), customers_list=customers_list)
+    return render_template('manageAdmin.html', Users=User.query.all())
 
 
 
@@ -261,7 +243,7 @@ def delete_admin(id):
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for('home'))
 
 
@@ -1184,4 +1166,4 @@ def view_feedback1():
     return render_template('requested.html', count=len(feedback1_list), feedback1_list=feedback1_list)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

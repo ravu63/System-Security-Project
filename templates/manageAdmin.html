@@ -20,31 +20,20 @@
       </tr>
     </thead>
     <tbody>
-      {% for customer in customers_list %}
-      {%if customer.get_role()==1%}
+      {% for User in Users %}
+      {%if User.role==1%}
         <tr>
 
-          <td>{{ customer.get_name() }}</td>
-          <td>{{ customer.get_email() }}</td>
-          <td>{{customer.get_birthdate()}}</td>
-          {% if customer.get_gender() == "F" %}
+          <td>{{ User.name }}</td>
+          <td>{{ User.email }}</td>
+          <td>{{User.birthdate}}</td>
+          {% if User.gender == "F" %}
             <td>Female</td>
-          {% elif customer.get_gender() == "M" %}
+          {% elif User.gender == "M" %}
             <td>Male</td>
           {% endif %}
-          <td>{{customer.get_phone()}}</td>
+          <td>{{User.phone}}</td>
 
-          <td><a href="/updateAdmin/{{customer.get_email()}}" class="btn btn-warning">Update</a></td>
-          <td>
-            <form action="{{url_for('delete_admin', id=customer.get_email())}}" method="POST">
-
-          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{customer.get_email()}}">
-            <input type="submit" value="Delete" class="btn btn-danger">
-          </form>
-
-
-            </form>
-          </td>
         </tr>
       {%endif%}
       {% endfor %}
