@@ -12,7 +12,7 @@ from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
-from Forms import   UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
+from Forms import   UpdateCustomerForm2, ForgetPassword, OTPform, \
     ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
@@ -78,6 +78,20 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()],render_kw={"placeholder":"Password:"})
     submit = SubmitField('Login')
 
+
+
+class UpdateCustomerForm(Form):
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],render_kw={"placeholder":"Name:"})
+    gender = SelectField('Gender', [validators.DataRequired()],
+                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='',render_kw={"placeholder":"Gender:"})
+    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],render_kw={"placeholder":"Phone Number:"})
+    birthdate = DateField('Birthdate', format='%Y-%m-%d')
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()],render_kw={"placeholder":"Email:"})
+    submit=SubmitField('Update')
+
+    def validate_phone(self, phone):
+        if not phone.data[1:8].isdigit():
+            raise ValidationError("Phone number must not contain letters")
 
 
 
@@ -214,29 +228,18 @@ def customer_Admin(id):
 @app.route('/deleteCustomer/<id>', methods=['POST'])
 @login_required
 def delete_customer(id):
-    customer_dict = {}
-    db = shelve.open('signup.db', 'w')
-    customer_dict = db['Customers']
-
-    customer_dict.pop(id)
-
-    db['Customers'] = customer_dict
-    db.close()
-
+    user=User.query.get(id)
+    db.session.delete(user)
+    db.session.commit()
     return redirect(url_for('manage_customers'))
 
 
 @app.route('/deleteAdmin/<id>', methods=['POST'])
 @login_required
 def delete_admin(id):
-    customer_dict = {}
-    db = shelve.open('signup.db', 'w')
-    customer_dict = db['Customers']
-
-    customer_dict.pop(id)
-
-    db['Customers'] = customer_dict
-    db.close()
+    user = User.query.get(id)
+    db.session.delete(user)
+    db.session.commit()
 
     return redirect(url_for('manage_admin'))
 

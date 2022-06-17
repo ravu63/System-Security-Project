@@ -31,11 +31,19 @@
             <td>Male</td>
           {% endif %}
           <td>{{User.phone}}</td>
+        <td>
+            <form action="{{url_for('delete_customer', id=User.id)}}" method="POST">
 
+          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{User.id}}">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
 
+            </form>
+          </td>
         </tr>
         {%endif%}
       {% endfor %}
+
 
     </tbody>
   </table>
