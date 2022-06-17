@@ -1,5 +1,5 @@
 from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField
-from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
+from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField,SubmitField
 
 
 class LoginForm(Form):
@@ -17,10 +17,14 @@ class CreateCustomerForm(Form):
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
                                           validators.EqualTo('confirmpassword', message='Error:Passwords must match')])
     confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
-
+    submit=SubmitField('Register')
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
             raise ValidationError("Phone number must not contain letters")
+    def validate_email(self,email):
+        existing_user_email=User.query.filter.filter_by(email=email.data).first()
+        if existing_user_email:
+            raise ValidationError('Account already exists.')
 
 
 class SearchCustomerForm(Form):

@@ -12,15 +12,22 @@ from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
-from Forms import CreateCustomerForm, LoginForm, UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
+from Forms import   UpdateCustomerForm, UpdateCustomerForm2, ForgetPassword, OTPform, \
     ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
+from flask_wtf import FlaskForm
+from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField, SubmitField
+from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
+from wtforms.validators import InputRequired,length,ValidationError
 from transaction import Transaction, CustomerPurchase
 from Currency import Currency
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
+from flask_login import UserMixin, login_user, LoginManager, login_required,logout_user, current_user
+from flask_bcrypt import Bcrypt
+
 app = Flask(__name__)
+app.debug=True
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_DEBUG'] = True
@@ -28,10 +35,12 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
 app.config['MAIL_PASSWORD'] = "Radiant12345"
+mail = Mail(app)
+bcrypt=Bcrypt(app)
 
 db=SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
-app.config['SECRET_KEY']='thisisasecretkey'
+
 
 class User(db.Model, UserMixin):
     id=db.Column(db.Integer, primary_key=True)
@@ -43,9 +52,45 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     role=db.Column(db.Integer, nullable=False)
 
-mail = Mail(app)
 
-app = Flask(__name__)
+class CreateCustomerForm(FlaskForm):
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],render_kw={"placeholder":"Name:"})
+    gender = SelectField('Gender', [validators.DataRequired()],
+                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='',render_kw={"placeholder":"Gender:"})
+    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],render_kw={"placeholder":"Phone Number:"})
+    birthdate = DateField('Birthdate', format='%Y-%m-%d')
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()],render_kw={"placeholder":"Email:"})
+    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
+                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')],render_kw={"placeholder":"Password:"})
+    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()],render_kw={"placeholder":"Confirm Password:"})
+    submit=SubmitField('Register')
+    def validate_phone(self, phone):
+        if not phone.data[1:8].isdigit():
+            raise ValidationError("Phone number must not contain letters")
+    def validate_email(self,email):
+        existing_user_email=User.query.filter_by(email=email.data).first()
+        if existing_user_email:
+            raise ValidationError(flash(u'User exists'))
+
+
+class LoginForm(FlaskForm):
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()],render_kw={"placeholder":"Email:"})
+    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()],render_kw={"placeholder":"Password:"})
+    submit = SubmitField('Login')
+
+
+
+
+login_manager=LoginManager()
+login_manager.init_app(app)
+login_manager.login_view='login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+
 app.config['SECRET_KEY'] = 'mysecret'
 app.static_folder = 'static'
 
@@ -56,11 +101,13 @@ def home():
 
 
 @app.route('/main', methods=['GET', 'POST'])
+@login_required
 def main():
     return render_template('main.html')
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
     return render_template('dashboard.html')
 
@@ -73,132 +120,49 @@ def page_not_found(e):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    login_form = LoginForm(request.form)
-    if request.method == 'POST':
-        users = shelve.open('signup.db', 'r')
-        email = request.form['email']
-        password = request.form['password']
-        users_dict = users['Customers']
-
-        users_keys = list(users_dict.keys())
-        try:
-            user = users_dict[email]
-            if user.get_email() == email:
-                if user.check_password(password):
-                    if user.get_role() == 0:
-                        session['id'] = user.get_email()
-                        users.close()
-                        return redirect(url_for('main'))
-                    else:
-                        users.close()
-                        return redirect(url_for('dashboard'))
+    form=LoginForm()
+    if form.validate_on_submit():
+        user=User.query.filter_by(email=form.email.data).first()
+        if user:
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                login_user(user)
+                if user.role==0:
+                    return redirect(url_for('main'))
                 else:
-                    flash(u'Invalid password or email provided')
-            else:
-                flash(u'Invalid password or email provided')
-        except:
-            flash(u'Invalid password or email provided')
-
-    return render_template('login.html', form=login_form)
+                    return redirect(url_for('dashboard'))
+    return render_template('login.html', form=form)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    create_customer_form = CreateCustomerForm(request.form)
-    if request.method == 'POST' and create_customer_form.validate():
-        customers_dict = {}
-        db = shelve.open('signup.db', 'c')
+    form=CreateCustomerForm()
+    if form.validate_on_submit():
+        hashed_password=bcrypt.generate_password_hash(form.password.data)
+        new_user=User(name=form.name.data, gender=form.gender.data, phone=form.phone.data, birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
 
-        try:
-            customers_dict = db['Customers']
-        except:
-            print("Error in retrieving Customers from customer.db.")
-        try:
-            user = shelve.open('signup.db', 'r')
-            users_dict = user['Customers']
-            users_keys = list(users_dict.keys())
-            if create_customer_form.email.data in users_keys:
-                flash(u'User exists')
-            else:
-                customer = Customer.Customer(
-                    create_customer_form.name.data,
-                    create_customer_form.gender.data,
-                    create_customer_form.phone.data,
-                    create_customer_form.birthdate.data,
-                    create_customer_form.email.data,
-                    create_customer_form.password.data
-                )
-                customers_dict[customer.get_email()] = customer
-                db['Customers'] = customers_dict
-                db.close()
-                return redirect(url_for('login'))
+    return render_template('signup.html',form=form)
 
-        except:
-            customer = Customer.Customer(
-                create_customer_form.name.data,
-                create_customer_form.gender.data,
-                create_customer_form.phone.data,
-                create_customer_form.birthdate.data,
-                create_customer_form.email.data,
-                create_customer_form.password.data
-            )
-            customers_dict[customer.get_email()] = customer
-            db['Customers'] = customers_dict
-            db.close()
-            return redirect(url_for('login'))
-
-    return render_template('signup.html', form=create_customer_form)
 
 
 @app.route('/createAdmin', methods=['GET', 'POST'])
+@login_required
 def create_admin():
-    create_customer_form = CreateCustomerForm(request.form)
-    if request.method == 'POST' and create_customer_form.validate():
-        customers_dict = {}
-        db = shelve.open('signup.db', 'c')
-
-        try:
-            customers_dict = db['Customers']
-        except:
-            print("Error in retrieving Customers from customer.db.")
-
-        try:
-            user = shelve.open('signup.db', 'r')
-            users_dict = user['Customers']
-            users_keys = list(users_dict.keys())
-            if create_customer_form.email.data in users_keys:
-                flash(u'User exists')
-            else:
-                customer = Admin.Customer(
-                    create_customer_form.name.data,
-                    create_customer_form.gender.data,
-                    create_customer_form.phone.data,
-                    create_customer_form.birthdate.data,
-                    create_customer_form.email.data,
-                    create_customer_form.password.data
-                )
-                customers_dict[customer.get_email()] = customer
-                db['Customers'] = customers_dict
-                db.close()
-                return redirect(url_for('manage_admin'))
-
-        except:
-            customer = Admin.Customer(
-                create_customer_form.name.data,
-                create_customer_form.gender.data,
-                create_customer_form.phone.data,
-                create_customer_form.birthdate.data,
-                create_customer_form.email.data,
-                create_customer_form.password.data
-            )
-            customers_dict[customer.get_email()] = customer
-            db['Customers'] = customers_dict
-            db.close()
-            return redirect(url_for('manage_admin'))
-    return render_template('createAdmin.html', form=create_customer_form)
+    form = CreateCustomerForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
+                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('manage_admin'))
+    return render_template('createAdmin.html', form=form)
 
 
 @app.route('/manageCustomer', methods=['GET', 'POST'])
+@login_required
 def manage_customers():
     customers_dict = {}
     db = shelve.open('signup.db', 'r')
@@ -213,6 +177,7 @@ def manage_customers():
 
 
 @app.route('/manageAdmin', methods=['GET', 'POST'])
+@login_required
 def manage_admin():
     customers_dict = {}
     db = shelve.open('signup.db', 'r')
@@ -228,6 +193,7 @@ def manage_admin():
 
 
 @app.route('/updateAdmin/<id>/', methods=['GET', 'POST'])
+@login_required
 def customer_Admin(id):
     update_customer_form = UpdateCustomerForm(request.form)
 
@@ -264,6 +230,7 @@ def customer_Admin(id):
 
 
 @app.route('/deleteCustomer/<id>', methods=['POST'])
+@login_required
 def delete_customer(id):
     customer_dict = {}
     db = shelve.open('signup.db', 'w')
@@ -278,6 +245,7 @@ def delete_customer(id):
 
 
 @app.route('/deleteAdmin/<id>', methods=['POST'])
+@login_required
 def delete_admin(id):
     customer_dict = {}
     db = shelve.open('signup.db', 'w')
@@ -365,6 +333,7 @@ def change_password(id):
 
 
 @app.route('/manageAccount/<id>/', methods=['GET', 'POST'])
+@login_required
 def manage_account(id):
     update_customer_form = UpdateCustomerForm(request.form)
     if request.method == 'POST' and update_customer_form.validate():
@@ -400,6 +369,7 @@ def manage_account(id):
 
 
 @app.route('/customerChangePass/<id>/', methods=['GET', 'POST'])
+@login_required
 def customer_change(id):
     update_customer_form = ChangePassword(request.form)
     if request.method == 'POST' and update_customer_form.validate():
@@ -427,6 +397,7 @@ def customer_change(id):
 
 
 @app.route('/searchCustomer', methods=['GET', 'POST'])
+@login_required
 def search_customer():
     search_customer_form = SearchCustomerForm(request.form)
     if request.method == 'POST' and search_customer_form.validate():
@@ -453,6 +424,7 @@ def search_customer():
 
 
 @app.route('/searchAdmin', methods=['GET', 'POST'])
+@login_required
 def search_admin():
     search_customer_form = SearchCustomerForm(request.form)
     if request.method == 'POST' and search_customer_form.validate():
@@ -476,131 +448,6 @@ def search_admin():
         else:
             return redirect(url_for('no_customer'))
     return render_template('searchCustomer.html', form=search_customer_form)
-
-
-@app.route('/feedback/<id>/', methods=['GET', 'POST'])
-def create_feedback(id):
-    create_feedback_form = FeedbackForm(request.form)
-    if request.method == 'POST' and create_feedback_form.validate():
-        feedback_dict = {}
-        db = shelve.open('feedback.db', 'c')
-
-        try:
-            feedback_dict = db['Feedback']
-        except:
-            print("Error in retrieving Customers from Feedback.db.")
-
-        feedback = Feedback.Feedback(
-            create_feedback_form.name.data,
-            create_feedback_form.email.data,
-            create_feedback_form.service.data,
-            create_feedback_form.website.data,
-            create_feedback_form.additional.data
-
-        )
-        feedback.set_status('Processing')
-        today = date.today()
-        feedback.set_date(today)
-        feedback_dict[feedback.get_email()] = feedback
-        db['Feedback'] = feedback_dict
-        db.close()
-        return redirect(url_for('main'))
-    else:
-        customer_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
-
-        customer = customer_dict.get(id)
-        create_feedback_form.name.data = customer.get_name()
-        create_feedback_form.email.data = customer.get_email()
-    return render_template('feedback.html', form=create_feedback_form)
-
-
-@app.route('/manageFeedback', methods=['GET', 'POST'])
-def manage_feedback():
-    feedback_dict = {}
-    db = shelve.open('feedback.db', 'r')
-    feedback_dict = db['Feedback']
-    db.close()
-
-    feedback_list = []
-    for key in feedback_dict:
-        feedback = feedback_dict.get(key)
-        feedback_list.append(feedback)
-    return render_template('manageFeedback.html', count=len(feedback_list), feedback_list=feedback_list)
-
-
-@app.route('/updateFeedback/<id>/', methods=['GET', 'POST'])
-def update_status(id):
-    update_customer_form = UpdateStatus(request.form)
-
-    if request.method == 'POST' and update_customer_form.validate():
-        customer_dict = {}
-        db = shelve.open('feedback.db', writeback=True)
-        customer_dict = db['Feedback']
-
-        customer = customer_dict.get(id)
-        customer.set_name(update_customer_form.name.data)
-        customer.set_email(update_customer_form.email.data)
-        customer.set_service(update_customer_form.service.data)
-        customer.set_website(update_customer_form.website.data)
-        customer.set_additional(update_customer_form.additional.data)
-        customer.set_date(update_customer_form.date.data)
-        customer.set_status(update_customer_form.status.data)
-
-        db['Customers'] = customer_dict
-        db.sync()
-        db.close()
-
-        return redirect(url_for('manage_feedback'))
-    else:
-        users_dict = {}
-        db = shelve.open('feedback.db', 'r')
-        customer_dict = db['Feedback']
-        db.close()
-
-        customer = customer_dict.get(id)
-        update_customer_form.name.data = customer.get_name()
-        update_customer_form.email.data = customer.get_email()
-        update_customer_form.service.data = customer.get_service()
-        update_customer_form.website.data = customer.get_website()
-        update_customer_form.additional.data = customer.get_additional()
-        update_customer_form.date.data = customer.get_date()
-        update_customer_form.status.data = customer.get_status()
-
-        return render_template('updateStatus.html', form=update_customer_form)
-
-
-@app.route('/viewFeedback/<id>/', methods=['GET', 'POST'])
-def view_feedback(id):
-    feedback_dict = {}
-    db = shelve.open('feedback.db', 'r')
-    feedback_dict = db['Feedback']
-    db.close()
-
-    feedback_list = []
-    for key in feedback_dict:
-        feedback = feedback_dict.get(key)
-        if feedback.get_email() == session['id']:
-            feedback_list.append(feedback)
-        else:
-            continue
-    return render_template('viewFeedback.html', count=len(feedback_list), feedback_list=feedback_list)
-
-
-@app.route('/deleteFeedback/<id>', methods=['POST'])
-def delete_feedback(id):
-    customer_dict = {}
-    db = shelve.open('feedback.db', 'w')
-    customer_dict = db['Feedback']
-
-    customer_dict.pop(id)
-
-    db['Feedback'] = customer_dict
-    db.close()
-
-    return redirect(url_for('manage_feedback'))
 
 
 @app.route('/noCustomer')
@@ -1338,4 +1185,3 @@ def view_feedback1():
 
 if __name__ == '__main__':
     app.run()
-    FLASK_DEBUG = True
