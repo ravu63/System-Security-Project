@@ -42,7 +42,7 @@ bcrypt=Bcrypt(app)
 db=SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
 
-
+#Create table
 class User(db.Model, UserMixin):
     id=db.Column(db.Integer, primary_key=True)
     name=db.Column(db.String(20), nullable=False)
@@ -52,8 +52,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role=db.Column(db.Integer, nullable=False)
+#end Create table
 
-
+#Forms
 class CreateCustomerForm(FlaskForm):
     name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],render_kw={"placeholder":"Name:"})
     gender = SelectField('Gender', [validators.DataRequired()],
@@ -94,7 +95,7 @@ class UpdateCustomerForm(FlaskForm):
         if not phone.data[1:8].isdigit():
             raise ValidationError("Phone number must not contain letters")
 
-
+#End Fomrs
 
 login_manager=LoginManager()
 login_manager.init_app(app)
