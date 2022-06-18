@@ -25,6 +25,7 @@ from Currency import Currency
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required,logout_user, current_user
 from flask_bcrypt import Bcrypt
+from datetime import date
 
 app = Flask(__name__)
 app.debug=True
@@ -80,10 +81,10 @@ class LoginForm(FlaskForm):
 
 
 
-class UpdateCustomerForm(Form):
+class UpdateCustomerForm(FlaskForm):
     name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],render_kw={"placeholder":"Name:"})
     gender = SelectField('Gender', [validators.DataRequired()],
-                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='',render_kw={"placeholder":"Gender:"})
+                         choices=[ ('F', 'Female'), ('M', 'Male')],default='',render_kw={"placeholder":"Gender:"})
     phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],render_kw={"placeholder":"Phone Number:"})
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
     email = EmailField('Email', [validators.Email(), validators.DataRequired()],render_kw={"placeholder":"Email:"})
@@ -191,38 +192,19 @@ def manage_admin():
 @app.route('/updateAdmin/<id>/', methods=['GET', 'POST'])
 @login_required
 def customer_Admin(id):
-    update_customer_form = UpdateCustomerForm(request.form)
-
-    if request.method == 'POST' and update_customer_form.validate():
-        customer_dict = {}
-        db = shelve.open('signup.db', 'w')
-        customer_dict = db['Customers']
-
-        customer = customer_dict.get(id)
-        customer.set_name(update_customer_form.name.data)
-        customer.set_email(update_customer_form.email.data)
-        customer.set_gender(update_customer_form.gender.data)
-        customer.set_birthdate(update_customer_form.birthdate.data)
-        customer.set_phone(update_customer_form.phone.data)
-
-        db['Customers'] = customer_dict
-        db.close()
-
+    form = UpdateCustomerForm()
+    user = User.query.get_or_404(id)
+    if request.method == 'POST' and form.validate_on_submit():
+        user.name = request.form['name']
+        user.email = request.form['email']
+       # user.birthdate = int(date(request.form['birthdate']))
+        user.phone = request.form['phone']
+        user.gender = request.form['gender']
+        db.session.commit()
+        flash("User updated successfully!")
         return redirect(url_for('manage_admin'))
-    else:
-        users_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
 
-        customer = customer_dict.get(id)
-        update_customer_form.name.data = customer.get_name()
-        update_customer_form.email.data = customer.get_email()
-        update_customer_form.gender.data = customer.get_gender()
-        update_customer_form.birthdate.data = customer.get_birthdate()
-        update_customer_form.phone.data = customer.get_phone()
-
-        return render_template('updateAdmin.html', form=update_customer_form)
+    return render_template('updateAdmin.html', form=form,user=user)
 
 
 @app.route('/deleteCustomer/<id>', methods=['POST'])
