@@ -9,25 +9,20 @@
 <form method="POST" action="/updateAdmin/{{ user.id }}">
   {{ form.hidden_tag() }}
   <div class="form-group">
-      <h6>Name</h6>
-    {{ form.name(value=user.name)}}
+    {{ render_field(form.name, class="form-control",value=user.name) }}
   </div>
   <div class="form-group">
-      <h6>email</h6>
-    {{ form.email(value=user.email) }}
+    {{ render_field(form.email, class="form-control",value=user.email) }}
+  </div>
+   <div class="form-group">
+    {{ render_field(form.gender, class="form-control",value=user.gender) }}
   </div>
   <div class="form-group">
-      <h6>gender</h6>
-    {{ form.gender(value=user.gender)}}
+    {{ render_field(form.phone, class="form-control",value=user.phone) }}
   </div>
   <div class="form-group">
-      <h6>Phone Number</h6>
-    {{ form.phone(value=user.phone)}}
-  </div>
-  <div class="form-group">
-      <h6>Birthdate</h6>
-    {{ form.birthdate(value=user.birthdate)}}
-      </div>
+    {{ render_field(form.birthdate, class="form-control",value=user.birthdate) }}
+     </div>
 
   <div class="form-group">
     {{ form.submit }}

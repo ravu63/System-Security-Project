@@ -24,13 +24,11 @@
     {{ form.hidden_tag() }}
 
   <div class="form-group">
-      <h6>password</h6>
-    {{ form.password }}
+    {{ render_field(form.password, class="form-control") }}
   </div>
 
   <div class="form-group">
-      <h6>Confirm Password</h6>
-    {{ form.confirmpassword }}
+    {{ render_field(form.confirmpassword, class="form-control") }}
   </div>
         <div class="form-group">
     {{ form.submit }}

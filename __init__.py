@@ -20,6 +20,8 @@ from Currency import Currency
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
+import datetime
+import pytz
 
 app = Flask(__name__)
 app.debug = True
@@ -72,20 +74,16 @@ class Pawn(db.Model):
 # Forms
 # Joshua
 class CreateCustomerForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],
-                       render_kw={"placeholder": "Name:"})
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],)
     gender = SelectField('Gender', [validators.DataRequired()],
-                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='',
-                         render_kw={"placeholder": "Gender:"})
-    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],
-                        render_kw={"placeholder": "Phone Number:"})
+                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='')
+    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
-                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')],
-                             render_kw={"placeholder": "Password:"})
-    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()],
-                                    render_kw={"placeholder": "Confirm Password:"})
+                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')]
+                             )
+    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
     submit = SubmitField('Register')
 
     def validate_phone(self, phone):
@@ -99,21 +97,19 @@ class CreateCustomerForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
-    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()],
-                             render_kw={"placeholder": "Password:"})
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()])
     submit = SubmitField('Login')
 
 
 class UpdateCustomerForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],
-                       render_kw={"placeholder": "Name:"})
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()]
+                       )
     gender = SelectField('Gender', [validators.DataRequired()],
-                         choices=[('F', 'Female'), ('M', 'Male')], default='', render_kw={"placeholder": "Gender:"})
-    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],
-                        render_kw={"placeholder": "Phone Number:"})
+                         choices=[('F', 'Female'), ('M', 'Male')], default='')
+    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     submit = SubmitField('Update')
 
     def validate_phone(self, phone):
@@ -241,9 +237,13 @@ def login():
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 if user.role == 0:
+                    session['id']=user.id
                     return redirect(url_for('main'))
                 else:
+                    session['id'] = user.id
                     return redirect(url_for('dashboard'))
+            else:
+                flash(u'Invalid Email or Password')
     return render_template('login.html', form=form)
 
 
@@ -352,6 +352,8 @@ def forgot_password():
 def getOTP():
     if request.method == 'POST':
         otp = random.randint(1111, 9999)
+        then=datetime.datetime.now()
+        session['time']=then
         session['otp'] = otp
         msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[session['email']])
         msg.body = 'here is your OTP:{}'.format(otp)
@@ -363,11 +365,20 @@ def getOTP():
 @app.route('/OTP', methods=['POST', 'GET'])
 def OTP():
     login_form = OTPform(request.form)
+    then=session['time']
+
     if request.method == 'POST':
         otp = session['otp']
         otp2 = int(request.form['otp3'])
         if otp == otp2:
-            return redirect(url_for('change_password', id=id))
+            now = datetime.datetime.now()
+            utc = pytz.UTC
+            now = utc.localize(now)
+            current = (now - then).total_seconds()
+            if current<900:
+                return redirect(url_for('change_password', id=id))
+            else:
+                flash(u'OTP has expired please retry again.')
         else:
             flash(u'Invalid OTP provided')
     return render_template('OTP.html', form=login_form)
@@ -383,14 +394,15 @@ def change_password(id):
         user.password = hashed_password
         db.session.commit()
         return redirect(url_for('login'))
-    return render_template('customerChangePass.html', form=form)
+    return render_template('ChangePassword.html', form=form)
 
 
 @app.route('/manageAccount/<id>/', methods=['GET', 'POST'])
 @login_required
 def manage_account(id):
+    id=session['id']
     form = UpdateCustomerForm()
-    user = User.query.get_or_404(id)
+    user = User.query.get(id)
     if request.method == 'POST' and form.validate_on_submit():
         user.name = request.form['name']
         user.email = request.form['email']
@@ -400,14 +412,15 @@ def manage_account(id):
         db.session.commit()
         return redirect(url_for('main'))
 
-    return render_template('manageAccount.html', form=form)
+    return render_template('manageAccount.html', form=form, user=user)
 
 
 @app.route('/customerChangePass/<id>/', methods=['GET', 'POST'])
 @login_required
 def customer_change(id):
+    id=session['id']
     form = UpdateCustomerForm2()
-    user = User.query.get_or_404(id)
+    user = User.query.get(id)
     if request.method == 'POST' and form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         user.password = hashed_password
