@@ -3,7 +3,7 @@
 
 {% block content %}
 {% from "includes/_formHelper.html" import render_field %} 
-<h1>Retreive Status</h1>
+<h1>Retrieve Status</h1>
 <div>
     <table class="table table-striped">
         <thead>
@@ -15,15 +15,14 @@
             </tr>
           </thead>
           <tbody>
-            {% for pawn in pawns_list %}
+
             <tr>
-                <td>{{ pawn.get_SUI() }}</td>
-                <td>{{ pawn.get_nric() }}</td>
-                <td>{{ pawn.get_offer_price() }}</td>
-                <td>{{ pawn.get_pawnstatus() }}</td>
+                <td>{{ sui }}</td>
+                <td>{{ nric }}</td>
+                <td>{{ offer_price }}</td>
+                <td>{{ pawn_status }}</td>
+                </tr>
           </tbody>
-            </tr>
         </table>
     </div>
-    {% endfor %}
 {% endblock %}
