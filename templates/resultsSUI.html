@@ -17,31 +17,29 @@
         </tr>
       </thead>
       <tbody>
-      {% for pawn in pawns_list %}
         <tr>
-        <td>{{ pawn.get_SUI() }}</td>
-        <td>{{ pawn.get_firstname() }}</td>
-        <td>{{ pawn.get_nric() }}</td>
-        <td>{{ pawn.get_category() }}</td>
-        <td>{{ pawn.get_ItemCondition() }}</td>
-        <td>{{ pawn.get_pawnstatus() }}</td>
+        <td>{{ pawn.sui }}</td>
+        <td>{{ pawn.first_name }}</td>
+        <td>{{ pawn.nric }}</td>
+        <td>{{ pawn.category }}</td>
+        <td>{{ pawn.ItemCondition }}</td>
+        <td>{{ pawn.pawn_status }}</td>
         <td>
-          <form action="{{url_for('view_pawn', id=pawn.get_item_id())}}" method="POST">
+          <form action="{{url_for('view_pawn', id=pawn.id)}}" method="POST">
             <input type="submit" value="View" class="btn btn-danger">
           </form>
         </td>
         <td>
-          <form action="{{url_for('update_pawn', id=pawn.get_item_id())}}"  method="POST">
+          <form action="{{url_for('update_pawn', id=pawn.id)}}"  method="POST">
             <input type="submit" value="Update" class="btn btn-danger">
           </form>
         </td>
           <td>
-            <form action="{{url_for('delete_pawn', id=pawn.get_item_id())}}"  method="POST">
+            <form action="{{url_for('delete_pawn', id=pawn.id)}}"  method="POST">
               <input type="submit" value="Delete" class="btn btn-danger">
             </form>
           </td>
     </tr>
-    {% endfor %}
     </tbody>
   </table>
 </div>

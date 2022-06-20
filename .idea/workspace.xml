@@ -4,11 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c7932994-ae26-45ef-a26e-1f1fbe745ddb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/a2e4212e-b37e-41f4-995b-008a74d8b318.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/a2e4212e-b37e-41f4-995b-008a74d8b318.xml" afterDir="false" />
+    <list default="true" id="c7932994-ae26-45ef-a26e-1f1fbe745ddb" name="Changes" comment="First Search Done.Left with 2 more">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/showStatus.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/showStatus.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/database.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/filterStatus.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/filterStatus.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/resultStatus.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/resultStatus.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/resultsSUI.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/resultsSUI.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/searchSUI.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/searchSUI.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,8 +108,17 @@
       <workItem from="1655616862914" duration="12898000" />
       <workItem from="1655645780595" duration="1618000" />
       <workItem from="1655652366563" duration="13738000" />
-      <workItem from="1655715399218" duration="1436000" />
+      <workItem from="1655715399218" duration="1833000" />
+      <workItem from="1655733904224" duration="3565000" />
     </task>
+    <task id="LOCAL-00001" summary="First Search Done.Left with 2 more">
+      <created>1655717186785</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1655717186785</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -126,6 +138,10 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="First Search Done.Left with 2 more" />
+    <option name="LAST_COMMIT_MESSAGE" value="First Search Done.Left with 2 more" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -137,6 +153,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/System_Security_Project$System_Security_Project.coverage" NAME="System-Security-Project Coverage Results" MODIFIED="1655716838748" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/System_Security_Project$System_Security_Project.coverage" NAME="System-Security-Project Coverage Results" MODIFIED="1655737493376" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

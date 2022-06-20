@@ -875,58 +875,25 @@ def retrieve_status():
 
 @app.route('/searchSUI', methods=['GET', 'POST'])
 def search_sui():
-    search_status_form = SearchSUI(request.form)
-    if request.method == 'POST' and search_status_form.validate():
-        f_search = search_status_form.SUI_CODE.data
-        pawns_dict = {}
-        db = shelve.open('pawn1.db', 'r')
-        pawns_dict = db['Pawns']
-        db.close()
-        search = str(f_search)
-        pawns_list = []
-        for key in pawns_dict:
-            pawn = pawns_dict.get(key)
-            if pawn.get_SUI() == search:
-                pawns_list.append(pawn)
-
-            else:
-                continue
-
-        if len(pawns_list) != 0:
-            return render_template("resultsSUI.html", count=len(pawns_list), pawns_list=pawns_list)
-
+    form = SearchSUI()
+    if form.validate_on_submit():
+        pawn = Pawn.query.filter_by(sui=form.SUI_CODE.data).first()
+        if pawn:
+            return render_template('resultsSUI.html',pawn=pawn)
         else:
-            return render_template("noSUI.html")
+            return render_template('noSUI.html')
 
-    return render_template('searchSUI.html', form=search_status_form)
+    return render_template('searchSUI.html', form=form)
 
 
 @app.route('/filterStatus', methods=['GET', 'POST'])
 def filter_status():
-    filter_status_form = filterStatus(request.form)
-    if request.method == 'POST' and filter_status_form.validate():
-        f_search = filter_status_form.pawn_status.data
-        pawns_dict = {}
-        db = shelve.open('pawn1.db', 'r')
-        pawns_dict = db['Pawns']
-        db.close()
-        search = str(f_search)
-        pawns_list = []
-        for key in pawns_dict:
-            pawn = pawns_dict.get(key)
-            if pawn.get_pawnstatus() == search:
-                pawns_list.append(pawn)
+    form = filterStatus()
+    if form.validate_on_submit():
+        pawn = Pawn.query.filter_by(pawn_status=form.pawn_status.data).all()
+        return render_template('resultStatus.html',pawn=pawn)
 
-            else:
-                continue
-
-        if len(pawns_list) != 0:
-            return render_template('resultStatus.html', count=len(pawns_list), pawns_list=pawns_list)
-
-        else:
-            return render_template("noSUI.html")
-
-    return render_template('filterStatus.html', form=filter_status_form)
+    return render_template('filterStatus.html', form=form)
 
 
 # End of Ravu
