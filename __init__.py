@@ -865,9 +865,11 @@ def update_pawn(id):
 def retrieve_status():
     form = PawnRetrieval()
     if form.validate_on_submit():
-        pawn = Pawn.query.filter_by(pawn_status=form.SUI_CODE.data).all()
-        return render_template("showStatus.html", pawn=pawn)
-
+        pawn = Pawn.query.filter_by(sui=form.SUI_CODE.data).first()
+        if pawn:
+            return render_template('showStatus.html', pawn=pawn)
+        else:
+            return render_template('noshowStatus.html', pawn=pawn)
     return render_template('retrieveSUI.html', form=form)
 
 
