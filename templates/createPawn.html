@@ -3,49 +3,62 @@
 
 {% block content %}
 {% from "includes/_formHelper.html" import render_field %} 
-<h1 class="display-4">Pawn Creation</h1>
-<h3 class="display-4">Personal Particulars</h3>
+<h3 class="display-4">Pawn Creation</h3>
+<h4 class="display-4">Personal Particulars</h4>
 <form method="POST" action="">
+{{ form.hidden_tag() }}
   <div class="form-group">
-    {{ render_field(form.first_name, class="form-control") }}
+      <h5>First Name</h5>
+    {{ form.first_name }}
   </div>
   <div class="form-group">
-    {{ render_field(form.last_name, class="form-control") }}
+      <h5>Last Name</h5>
+    {{ form.last_name }}
   </div>
   <div class="form-group">
-    {{ render_field(form.nric, class="form-control") }}
+      <h5>NRIC</h5>
+    {{ form.nric }}
   </div>
   <div class="form-group">
-    {{ render_field(form.contactnumber, class="form-control") }}
+      <h5>Contact Number</h5>
+    {{ form.contactnumber }}
   </div>
   <div class="form-group">
-    {{ render_field(form.email, class="form-control") }}
-  </div>
-  <div id="prof">
-    <div class="form-group">
-      {{ render_field(form.address, class="form-control") }}
-    </div>
-    </div>
-  <h3 class="display-4">Details of Item to be Pawned</h3>
-  <div class="form-group">
-    {{ render_field(form.itemname, class="form-control") }}
+      <h5>Email</h5>
+    {{ form.email}}
   </div>
   <div id="prof">
     <div class="form-group">
-      {{ render_field(form.Descriptionofitem, class="form-control") }}
+        <h5>Address</h5>
+      {{ form.address }}
+    </div>
+    </div>
+  <h4 class="display-4">Details of Item to be Pawned</h4>
+  <div class="form-group">
+      <h5>Item Name</h5>
+    {{ form.itemname }}
+  </div>
+  <div id="prof">
+    <div class="form-group">
+        <h5>Description of Item</h5>
+      {{ form.Descriptionofitem }}
     </div>
     </div>
   <div class="form-group">
-    {{ render_field(form.Category, class="form-control") }}
+      <h5>Category</h5>
+    {{ form.Category }}
   </div>
   <div class="form-group">
-    {{ render_field(form.ItemCondition, class="form-control") }}
+      <h5>Item Condition</h5>
+    {{ form.ItemCondition }}
   </div>
   <div class="form-group">
-    {{ render_field(form.offer_price, class="form-control") }}
+      <h5>Offer Price</h5>
+    {{ form.offer_price }}
   </div>
   <div class="form-group">
-    {{ render_field(form.pawn_period, class="form-control") }}
+      <h5>Pawn Period</h5>
+    {{ form.pawn_period}}
   </div>
   
   <input type="submit" value="Submit" class="btn btn-primary"/>

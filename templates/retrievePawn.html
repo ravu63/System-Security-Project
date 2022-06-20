@@ -4,15 +4,7 @@
 {% block content %}
 {% from "includes/_formHelper.html" import render_field %}
 <h1 class="display-4">Retrieve pawn</h1>
-<div>
-{% if count == 0 %}
-  <p>There are no Pawns.</p>
-  {% elif count == 1 %} 
-  <p>There is 1 Pawn.</p>
-  {% else %}
-  <p>There are {{ count }} Pawns.</p>
-  {% endif %}
-</div>
+
 <table class="w3-table w3-striped w3-border">
 <tr>
   <td>
@@ -41,26 +33,26 @@
         </tr>
       </thead>
       <tbody>
-      {% for pawn in pawn_list %}
+      {% for pawn in pawn %}
         <tr>
-        <td>{{ pawn.get_SUI() }}</td>
-        <td>{{ pawn.get_firstname() }}</td>
-        <td>{{ pawn.get_nric() }}</td>
-        <td>{{ pawn.get_category() }}</td>
-        <td>{{ pawn.get_ItemCondition() }}</td>
-        <td>{{ pawn.get_pawnstatus() }}</td>
+        <td>{{ pawn.sui }}</td>
+        <td>{{ pawn.first_name }}</td>
+        <td>{{ pawn.nric }}</td>
+        <td>{{ pawn.category }}</td>
+        <td>{{ pawn.ItemCondition }}</td>
+        <td>{{ pawn.pawn_status }}</td>
         <td>
-          <form action="{{url_for('view_pawn', id=pawn.get_item_id())}}" method="POST">
+          <form action="{{url_for('view_pawn', id=pawn.id)}}" method="POST">
             <input type="submit" value="View" class="btn btn-danger">
           </form>
         </td>
         <td>
-          <form action="{{url_for('update_pawn', id=pawn.get_item_id())}}"  method="POST">
+          <form action="{{url_for('update_pawn', id=pawn.id)}}"  method="POST">
             <input type="submit" value="Update" class="btn btn-danger">
           </form>
         </td>
           <td>
-            <form action="{{url_for('delete_pawn', id=pawn.get_item_id())}}"  method="POST">
+            <form action="{{url_for('delete_pawn', id=pawn.id)}}"  method="POST">
               <input type="submit" value="Delete" class="btn btn-danger">
             </form>
           </td>

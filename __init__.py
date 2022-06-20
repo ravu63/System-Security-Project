@@ -1,34 +1,28 @@
 from currency_converter import CurrencyConverter
-import Admin
-import Customer
-import Feedback
 import Loan
 import random
 import shelve
 import Plan
-from PawnCreation import Pawn_Creation
-from PawnStatus import Pawn_Status
-from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
-from Forms import   UpdateCustomerForm2, ForgetPassword, OTPform, \
-    ChangePassword, FeedbackForm, SearchCustomerForm, UpdateStatus, CreateLoanForm, CreatePlanForm, PawnCreation, \
+from Forms import UpdateCustomerForm2, ForgetPassword, OTPform, \
+    ChangePassword, SearchCustomerForm, CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from flask_wtf import FlaskForm
-from wtforms import Form, StringField, validators, PasswordField, SelectField, ValidationError, TextAreaField, SubmitField
-from wtforms.fields import EmailField, DateField, FileField, IntegerField, RadioField, SearchField
-from wtforms.validators import InputRequired,length,ValidationError
-from transaction import Transaction, CustomerPurchase
+from wtforms import StringField, validators, PasswordField, SelectField, TextAreaField, \
+    SubmitField
+from wtforms.fields import EmailField, DateField
+from wtforms.validators import ValidationError
+from transaction import CustomerPurchase
 from Currency import Currency
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, login_user, LoginManager, login_required,logout_user, current_user
+from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
-from datetime import date
 
 app = Flask(__name__)
-app.debug=True
+app.debug = True
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_DEBUG'] = True
@@ -37,74 +31,168 @@ app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
 app.config['MAIL_PASSWORD'] = "Radiant12345"
 mail = Mail(app)
-bcrypt=Bcrypt(app)
+bcrypt = Bcrypt(app)
 
-db=SQLAlchemy(app)
-app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
+db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
-#Create table
+
+# Create table
 class User(db.Model, UserMixin):
-    id=db.Column(db.Integer, primary_key=True)
-    name=db.Column(db.String(20), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20), nullable=False)
     gender = db.Column(db.String(1), nullable=False)
     phone = db.Column(db.String(8), nullable=False)
     birthdate = db.Column(db.Date, nullable=False)
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    role=db.Column(db.Integer, nullable=False)
-#end Create table
+    role = db.Column(db.Integer, nullable=False)
 
-#Forms
+
+class Pawn(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(20), nullable=False)
+    last_name = db.Column(db.String(20), nullable=False)
+    nric = db.Column(db.String(9), nullable=False)
+    contact_number = db.Column(db.String(8), nullable=False)
+    email = db.Column(db.String(30), nullable=False)
+    address = db.Column(db.String(100), nullable=False)
+    item_name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(30), nullable=False)
+    ItemCondition = db.Column(db.String(30), nullable=False)
+    offer_price = db.Column(db.String(30), nullable=False)
+    period = db.Column(db.String(10), nullable=False)
+    sui = db.Column(db.String(10), nullable=False)
+    pawn_status = db.Column(db.String(10), nullable=False)
+
+
+# end Create table
+
+# Forms
+# Joshua
 class CreateCustomerForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],render_kw={"placeholder":"Name:"})
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],
+                       render_kw={"placeholder": "Name:"})
     gender = SelectField('Gender', [validators.DataRequired()],
-                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='',render_kw={"placeholder":"Gender:"})
-    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],render_kw={"placeholder":"Phone Number:"})
+                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='',
+                         render_kw={"placeholder": "Gender:"})
+    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],
+                        render_kw={"placeholder": "Phone Number:"})
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()],render_kw={"placeholder":"Email:"})
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
-                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')],render_kw={"placeholder":"Password:"})
-    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()],render_kw={"placeholder":"Confirm Password:"})
-    submit=SubmitField('Register')
+                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')],
+                             render_kw={"placeholder": "Password:"})
+    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()],
+                                    render_kw={"placeholder": "Confirm Password:"})
+    submit = SubmitField('Register')
+
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
             raise ValidationError("Phone number must not contain letters")
-    def validate_email(self,email):
-        existing_user_email=User.query.filter_by(email=email.data).first()
+
+    def validate_email(self, email):
+        existing_user_email = User.query.filter_by(email=email.data).first()
         if existing_user_email:
             raise ValidationError(flash(u'User exists'))
 
 
 class LoginForm(FlaskForm):
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()],render_kw={"placeholder":"Email:"})
-    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()],render_kw={"placeholder":"Password:"})
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
+    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()],
+                             render_kw={"placeholder": "Password:"})
     submit = SubmitField('Login')
 
 
-
 class UpdateCustomerForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],render_kw={"placeholder":"Name:"})
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],
+                       render_kw={"placeholder": "Name:"})
     gender = SelectField('Gender', [validators.DataRequired()],
-                         choices=[ ('F', 'Female'), ('M', 'Male')],default='',render_kw={"placeholder":"Gender:"})
-    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],render_kw={"placeholder":"Phone Number:"})
+                         choices=[('F', 'Female'), ('M', 'Male')], default='', render_kw={"placeholder": "Gender:"})
+    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],
+                        render_kw={"placeholder": "Phone Number:"})
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()],render_kw={"placeholder":"Email:"})
-    submit=SubmitField('Update')
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
+    submit = SubmitField('Update')
 
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
             raise ValidationError("Phone number must not contain letters")
 
-#End Fomrs
 
-login_manager=LoginManager()
+# End of Joshua
+# Start of Ravu
+class PawnCreation(FlaskForm):
+    first_name = StringField('First Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+    last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.DataRequired()])
+    nric = StringField('NRIC', [validators.Length(min=9, max=9), validators.DataRequired()])
+    contactnumber = StringField('Contact Number', [validators.Length(min=8, max=8), validators.DataRequired()])
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    address = TextAreaField('Mailing Address', [validators.length(max=200), validators.DataRequired()])
+    itemname = StringField('Name of Item', [validators.Length(min=1, max=150), validators.DataRequired()])
+    Descriptionofitem = TextAreaField('Description of Item', [validators.length(max=200), validators.DataRequired()])
+    Category = SelectField('Category', [validators.DataRequired()],
+                           choices=[('', 'Select'), ('Jewelry', 'Jewelry'), ('Electronics', 'Electronics'),
+                                    ('Musical Instruments', 'Musical Instruments'), ('Watch', 'Watch'),
+                                    ('Antiques', 'Antiques'), ('Others', 'Others')], default='')
+    ItemCondition = SelectField('ItemCondition', [validators.DataRequired()],
+                                choices=[('', 'Select'), ('Heavily Used', 'Heavily Used'),
+                                         ('Lightly Used', 'Lightly Used'),
+                                         ('Like New', 'Like New'), ('New', 'New')], default='')
+    offer_price = StringField('Offer Price', [validators.Length(min=1, max=150), validators.DataRequired()])
+    pawn_period = StringField('Pawn Period(Month)', [validators.Length(min=1, max=150), validators.DataRequired()])
+    submit = SubmitField('Submit')
+
+    def validate_nric(form, nric):
+        if not nric.data[0].isalpha():
+            raise ValidationError("IC must start with S or T")
+        if not nric.data[1:7].isdigit():
+            raise ValidationError("IC needs to have 7 digits in between 2 letters")
+        if not nric.data[-1].isalpha():
+            raise ValidationError("IC must end with an alphabet")
+
+    def validate_contactnumber(form, contactnumber):
+        if not contactnumber.data.isdigit():
+            raise ValidationError("Your number should be in digits")
+
+class PawnStatus(FlaskForm):
+    pawn_status = SelectField('Pawn Status', [validators.DataRequired()],
+                              choices=[('Processing', 'Processing'), ('Picked Up', 'Picked Up'),
+                                       ('Delivered', 'Delivered'),
+                                       ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
+                                       ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='Processing')
+    submit = SubmitField('Submit')
+
+class PawnRetrieval(FlaskForm):
+    SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
+    submit = SubmitField('Submit')
+
+class SearchSUI(FlaskForm):
+    SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
+    submit = SubmitField('Submit')
+
+class filterStatus(FlaskForm):
+    pawn_status = SelectField('Filter by Status:', [validators.DataRequired()],
+                              choices=[('', 'Select'), ('Processing', 'Processing'), ('Picked Up', 'Picked Up'),
+                                       ('Delivered', 'Delivered'),
+                                       ('Inspection', 'Inspection'), ('Offer Accepted', 'Offer Accepted'),
+                                       ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='')
+    submit = SubmitField('Submit')
+
+# End of Ravu
+
+
+# End Forms
+
+login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view='login'
+login_manager.login_view = 'login'
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
 
 
 app.config['SECRET_KEY'] = 'mysecret'
@@ -136,13 +224,13 @@ def page_not_found(e):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form=LoginForm()
+    form = LoginForm()
     if form.validate_on_submit():
-        user=User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
-                if user.role==0:
+                if user.role == 0:
                     return redirect(url_for('main'))
                 else:
                     return redirect(url_for('dashboard'))
@@ -151,16 +239,16 @@ def login():
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    form=CreateCustomerForm()
+    form = CreateCustomerForm()
     if form.validate_on_submit():
-        hashed_password=bcrypt.generate_password_hash(form.password.data)
-        new_user=User(name=form.name.data, gender=form.gender.data, phone=form.phone.data, birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0)
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
+                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
 
-    return render_template('signup.html',form=form)
-
+    return render_template('signup.html', form=form)
 
 
 @app.route('/createAdmin', methods=['GET', 'POST'])
@@ -189,7 +277,6 @@ def manage_admin():
     return render_template('manageAdmin.html', Users=User.query.all())
 
 
-
 @app.route('/updateAdmin/<id>/', methods=['GET', 'POST'])
 @login_required
 def customer_Admin(id):
@@ -198,20 +285,20 @@ def customer_Admin(id):
     if request.method == 'POST' and form.validate_on_submit():
         user.name = request.form['name']
         user.email = request.form['email']
-       # user.birthdate = int(date(request.form['birthdate']))
+        # user.birthdate = int(date(request.form['birthdate']))
         user.phone = request.form['phone']
         user.gender = request.form['gender']
         db.session.commit()
         flash("User updated successfully!")
         return redirect(url_for('manage_admin'))
 
-    return render_template('updateAdmin.html', form=form,user=user)
+    return render_template('updateAdmin.html', form=form, user=user)
 
 
 @app.route('/deleteCustomer/<id>', methods=['POST'])
 @login_required
 def delete_customer(id):
-    user=User.query.get(id)
+    user = User.query.get(id)
     db.session.delete(user)
     db.session.commit()
     return redirect(url_for('manage_customers'))
@@ -421,6 +508,8 @@ def search_admin():
 @app.route('/noCustomer')
 def no_customer():
     return render_template('noCustomer.html')
+
+
 @app.route('/noRecord')
 def no_record():
     return render_template('noRecord.html')
@@ -430,23 +519,23 @@ def no_record():
 def show_customer():
     return render_template('showCustomer.html')
 
-@app.route('/customerStuff',methods=['GET','POST'])
-def customer_stuff():
-    search_customer_form=SearchCustomerForm(request.form)
-    if request.method=='POST'and search_customer_form.validate():
-        number=[]
-        searchCustomer=search_customer_form.searchCustomer.data
-        #transactions = shelve.open('transactions')
-        #transList = list(transactions.keys())
-        #transactions.close()
-        #trans = []
-        #for id in transList:
-         #   if transList.getEmail()==searchCustomer:
-          #      trans.append(transactions[id])
-           #     number.append('1')
-            #else:
-             #   continue
 
+@app.route('/customerStuff', methods=['GET', 'POST'])
+def customer_stuff():
+    search_customer_form = SearchCustomerForm(request.form)
+    if request.method == 'POST' and search_customer_form.validate():
+        number = []
+        searchCustomer = search_customer_form.searchCustomer.data
+        # transactions = shelve.open('transactions')
+        # transList = list(transactions.keys())
+        # transactions.close()
+        # trans = []
+        # for id in transList:
+        #   if transList.getEmail()==searchCustomer:
+        #      trans.append(transactions[id])
+        #     number.append('1')
+        # else:
+        #   continue
 
         # transaction_dict={}
         # trans=shelve.open('transactions','r')
@@ -462,8 +551,6 @@ def customer_stuff():
         #     else:
         #         continue
 
-
-
         loan_dict = {}
         loan = shelve.open('loan.db', 'r')
         loan_dict = loan['Loans']
@@ -478,8 +565,7 @@ def customer_stuff():
             else:
                 continue
 
-
-        pawn_dict ={}
+        pawn_dict = {}
         pawn = shelve.open('pawn1.db', 'r')
         pawn_dict = pawn['Pawns']
         pawn.close()
@@ -493,11 +579,11 @@ def customer_stuff():
             else:
                 continue
 
-        if len(number)>0:
-            return render_template("customerStuff.html", count=len(number), loan_list=loan_list,pawn_dict=pawn_dict)
+        if len(number) > 0:
+            return render_template("customerStuff.html", count=len(number), loan_list=loan_list, pawn_dict=pawn_dict)
         else:
             return redirect(url_for('no_record'))
-    return render_template('searchStuff.html',form=search_customer_form)
+    return render_template('searchStuff.html', form=search_customer_form)
 
 
 # Joshua
@@ -515,7 +601,7 @@ def loans():
         plan = plans_dict.get(key)
         plans_list.append(plan)
 
-    return render_template('Loan.html',count=len(plans_list), plans_lists=plans_list)
+    return render_template('Loan.html', count=len(plans_list), plans_lists=plans_list)
 
 
 @app.route('/createLoan.html', methods=['GET', 'POST'])
@@ -616,7 +702,7 @@ def create_plan():
             print("Error in retrieving Users from Plans.db.")
         planentry = Plan.Plan(create_plan_form.Plan_name.data,
                               create_plan_form.Plan_Des.data,
-                              create_plan_form.Plan_interest.data,)
+                              create_plan_form.Plan_interest.data, )
         plans_dict[planentry.get_loan_plan_id()] = planentry
         db['Plans'] = plans_dict
         db.close()
@@ -716,158 +802,73 @@ def delete_plan(id):
 # END OF LOAN INIT
 
 
-
-
-#Start of Ravu
+# Start of Ravu
 
 
 @app.route('/SUIshower', methods=['GET', 'POST'])
 def SUI_Shower():
-    pawns_dict = {}
-    db = shelve.open('pawn1.db', 'c')
-    pawns_dict = db['Pawns']
-    db.close()
-
-    pawn_list = []
-    for key in pawns_dict:
-        pawn = pawns_dict.get(key)
-        pawn_list.append(pawn)
-
-    return render_template('SUIshower.html', pawn_list=pawn_list, count=len(pawn_list))
+    pawn_mock = Pawn.query.all()
+    pawn = pawn_mock[-1].sui
+    return render_template('SUIshower.html', pawn=pawn)
 
 
 @app.route('/createPawn', methods=['GET', 'POST'])
 def createPawn():
-    create_pawn_form = PawnCreation(request.form)
-    if request.method == 'POST' and create_pawn_form.validate():
-        pawns_dict = {}
-        db = shelve.open('pawn1.db', 'c')
+    form = PawnCreation()
+    if form.validate_on_submit():
         sample_string = 'abcdefpqrstuvwxy'  # define the specific string
         # define the condition for random string
         SUI = ''.join((random.choice(sample_string)) for x in range(6))
-        try:
-            pawns_dict = db['Pawns']
-        except:
-            print("Error in retrieving Users from pawn1.db.")
-        pawn = Pawn_Creation(create_pawn_form.first_name.data, create_pawn_form.last_name.data, create_pawn_form.nric.data, create_pawn_form.contactnumber.data, create_pawn_form.email.data, create_pawn_form.address.data, create_pawn_form.itemname.data, create_pawn_form.Descriptionofitem.data, create_pawn_form.Category.data,
-                             create_pawn_form.ItemCondition.data, create_pawn_form.offer_price.data, create_pawn_form.pawn_period.data, SUI, 'Processing')
-        pawns_dict[pawn.get_item_id()] = pawn
-        db['Pawns'] = pawns_dict
-
-        db.close()
+        new_record = Pawn(first_name=form.first_name.data, last_name=form.last_name.data, nric=form.nric.data,
+                          contact_number=form.contactnumber.data, email=form.email.data, address=form.address.data,
+                          item_name=form.itemname.data, description=form.Descriptionofitem.data,
+                          category=form.Category.data, ItemCondition=form.ItemCondition.data,
+                          offer_price=form.offer_price.data, period=form.pawn_period.data, sui=SUI,
+                          pawn_status="Processing")
+        db.session.add(new_record)
+        db.session.commit()
         return redirect(url_for('SUI_Shower'))
-    return render_template('createPawn.html', form=create_pawn_form)
+    return render_template('createPawn.html', form=form)
 
 
 @app.route('/retrievePawn')
 def retrieve_pawn():
-    pawns_dict = {}
-    db = shelve.open('pawn1.db', 'c')
-    pawns_dict = db['Pawns']
-    db.close()
-
-    pawn_list = []
-    for key in pawns_dict:
-        pawn = pawns_dict.get(key)
-        pawn_list.append(pawn)
-
-    return render_template('retrievePawn.html', count=len(pawn_list), pawn_list=pawn_list)
+    return render_template('retrievePawn.html', pawn=Pawn.query.all())
 
 
 @app.route('/deletepawn/<int:id>', methods=['POST'])
 def delete_pawn(id):
-    pawns_dict = {}
-    db = shelve.open('pawn1.db', 'w')
-    pawns_dict = db['Pawns']
-    if id in pawns_dict:
-        pawns_dict.pop(id)
-        db['Pawns'] = pawns_dict
-        db.close()
-        return redirect(url_for('retrieve_pawn'))
-    return render_template('retrievePawn.html')
+    pawn = Pawn.query.get(id)
+    db.session.delete(pawn)
+    db.session.commit()
+    return redirect(url_for('retrieve_pawn'))
+
 
 
 @app.route('/viewpawn/<int:id>', methods=['GET', 'POST'])
 def view_pawn(id):
-    pawn_dict = {}
-    db = shelve.open('pawn1.db', 'w')
-    pawns_dict = db['Pawns']
-
-    db['Pawns'] = pawns_dict
-    db.close()
-
-    view_list = []
-    pawn = pawns_dict.get(id)
-    view_list.append(pawn)
-
-    return render_template('viewPawn.html', view_list=view_list)
+    pawn = Pawn.query.get(id)
+    return render_template('viewPawn.html', pawn = pawn)
 
 
 @app.route('/updatepawn/<int:id>/', methods=['GET', 'POST'])
 def update_pawn(id):
-    update_pawn_form = PawnStatus(request.form)
-    if request.method == 'POST' and update_pawn_form.validate():
-        pawns_dict = {}
-        db = shelve.open('pawn1.db', 'c')
-        pawns_dict = db['Pawns']
-        if id in pawns_dict:
-            pawn = pawns_dict.get(id)
-            pawn.set_firstname(pawn.get_firstname())
-            pawn.set_lastname(pawn.get_lastname())
-            pawn.set_nric(pawn.get_nric())
-            pawn.set_contactnumber(pawn.get_contactnumber())
-            pawn.set_email(pawn.get_email())
-            pawn.set_address(pawn.get_address())
-            pawn.set_itemname(pawn.get_itemname())
-            pawn.set_Descriptionofitem(pawn.get_Descriptionofitem())
-            pawn.set_category(pawn.get_category())
-            pawn.set_ItemCondition(pawn.get_ItemCondition())
-            pawn.set_offer_price(pawn.get_offer_price())
-            pawn.set_pawn_period(pawn.get_pawn_period())
-            pawn.set_SUI(pawn.get_SUI())
-            pawn.set_status(update_pawn_form.pawn_status.data)
-            db['Pawns'] = pawns_dict
-            db.close()
-
-    else:
-        pawns_dict = {}
-        db = shelve.open('pawn1.db', 'r')
-        if id in pawns_dict:
-            pawn = pawns_dict.get(id)
-            update_pawn_form.pawn_status.data = pawn.get_status()
-            pawns_dict = db['Pawns']
-            db.close()
-            return redirect(url_for('retrieve_pawn'))
-
-    return render_template('updateStatuspawn.html', form=update_pawn_form)
+    form = PawnStatus()
+    if form.validate_on_submit():
+        row_update = Pawn.query.filter_by(id=id).update(dict(pawn_status=form.pawn_status.data))
+        db.session.commit()
+        return redirect(url_for('retrieve_pawn'))
+    return render_template('updateStatuspawn.html', form=form)
 
 
 @app.route('/retrieveStatus', methods=['GET', 'POST'])
 def retrieve_status():
-    retrieve_status_form = PawnRetrieval(request.form)
-    if request.method == 'POST' and retrieve_status_form.validate():
-        f_search = retrieve_status_form.SUI_CODE.data
-        pawns_dict = {}
-        db = shelve.open('pawn1.db', 'r')
-        pawns_dict = db['Pawns']
-        db.close()
-        search = str(f_search)
-        pawns_list = []
-        for key in pawns_dict:
-            pawn = pawns_dict.get(key)
-            if pawn.get_SUI() == search:
-                pawns_list.append(pawn)
+    form = PawnRetrieval()
+    if form.validate_on_submit():
+        pawn = Pawn.query.filter_by(pawn_status=form.SUI_CODE.data).all()
+        return render_template("showStatus.html", pawn=pawn)
 
-            else:
-                continue
-
-        if len(pawns_list) != 0:
-            return render_template("showStatus.html", count=len(pawns_list), pawns_list=pawns_list)
-
-        else:
-            return render_template("noshowStatus.html")
-
-    return render_template('retrieveSUI.html', form=retrieve_status_form)
+    return render_template('retrieveSUI.html', form=form)
 
 
 @app.route('/searchSUI', methods=['GET', 'POST'])
@@ -925,7 +926,8 @@ def filter_status():
 
     return render_template('filterStatus.html', form=filter_status_form)
 
-#End of Ravu
+
+# End of Ravu
 
 
 # ashton
@@ -945,12 +947,16 @@ def convert(amt, first, second):
     rate = round(c.convert(1, first, second), 2)
     return final, rate
 
+
 @app.route('/moneyExchange', methods=['GET'])
 def moneyExchangePage():
     return render_template('moneyExchanger.html', countries=getCurrencyArray())
+
+
 @app.route('/moneyConvert', methods=['GET'])
 def moneyConvertPage():
     return render_template('moneyConvert.html', countries=getCurrencyArray())
+
 
 @app.route('/moneyExchangeUpdate', methods=['GET'])
 def moneyExchangeUpdate():
@@ -964,6 +970,7 @@ def moneyExchangeUpdate():
     transactions.close()
     return render_template('update.html', transactions=allTrans, objects=trans)
 
+
 @app.route('/moneyExchangeDelete', methods=['GET'])
 def moneyExchangeDelete():
     transactions = shelve.open('transactions')
@@ -975,6 +982,7 @@ def moneyExchangeDelete():
     allTrans = list(transactions.keys())
     transactions.close()
     return render_template('delete.html', transactions=allTrans, objects=trans)
+
 
 @app.route('/convertMoney', methods=['POST'])
 def moneyExchange():
@@ -1002,12 +1010,13 @@ def moneyExchange():
 
         elif 'checkout' in request.form:
             return render_template('checkout.html', amt=amt, result=result[0], first=first, second=second,
-                                   rate=result[1], cost=session['price'], initial=session['from'], after=session['to'], amount=session['amount'])
+                                   rate=result[1], cost=session['price'], initial=session['from'], after=session['to'],
+                                   amount=session['amount'])
 
         elif 'delete' in request.form:
             transactions = shelve.open('transactions')
             allTrans = list(transactions.keys())
-            return render_template('delete.html', transactions = allTrans)
+            return render_template('delete.html', transactions=allTrans)
 
         elif 'update' in request.form:
             transactions = shelve.open('transactions')
@@ -1018,7 +1027,7 @@ def moneyExchange():
                 print(transactions[id])
             allTrans = list(transactions.keys())
             transactions.close()
-            return render_template('update.html', transactions = allTrans, objects=trans)
+            return render_template('update.html', transactions=allTrans, objects=trans)
 
 
 @app.route('/completeCheckout', methods=['POST'])
@@ -1031,16 +1040,18 @@ def finishCheckout():
     print(len(transactions))
     # transaction id is incremented based off the length of transactions shelve
 
-    customerPaid = CustomerPurchase(request.form.get('firstname'), request.form.get('email'), request.form.get('address'),
-                              request.form.get('city'), request.form.get('state'), request.form.get('zip'),
-                                    amount=amt, initial=initial, to=to, price=price[0], transactionID=(len(transactions) + 1))
+    customerPaid = CustomerPurchase(request.form.get('firstname'), request.form.get('email'),
+                                    request.form.get('address'),
+                                    request.form.get('city'), request.form.get('state'), request.form.get('zip'),
+                                    amount=amt, initial=initial, to=to, price=price[0],
+                                    transactionID=(len(transactions) + 1))
 
     # we set the key to the transaction id: "1" : <object> and so on
     transactions[str(len(transactions) + 1)] = customerPaid
 
     transactions.close()
 
-    return render_template('finishCheckout.html', message = customerPaid)
+    return render_template('finishCheckout.html', message=customerPaid)
 
 
 @app.route('/deleteTransaction', methods=['POST'])
@@ -1055,6 +1066,7 @@ def transactionProcess():
         id = request.form.get('tId')
         del transactions[id]
         return render_template('delete.html', deleted=id, transactions=transList)
+
 
 # for now there is only name update, but there can be more added
 @app.route('/updateTransaction', methods=['POST'])
@@ -1113,7 +1125,7 @@ def Feedback2():
         except:
             print("Error in retrieving feedback from Feedback1.db.")
         try:
-            fb = shelve.open('feedback1.db','r')
+            fb = shelve.open('feedback1.db', 'r')
             fb_dict = fb['feedback1.db']
             feedback = Feedback1(
                 create_feedback1_form.name.data,
@@ -1138,6 +1150,7 @@ def Feedback2():
             return redirect(url_for('main'))
     return render_template('request.html', form=create_feedback1_form)
 
+
 @app.route('/viewFeedback1', methods=['GET', 'POST'])
 def view_feedback1():
     feedback1_dict = {}
@@ -1147,9 +1160,10 @@ def view_feedback1():
 
     feedback1_list = []
     for key in feedback1_dict:
-      feedback = feedback1_dict.get(key)
-      feedback1_list.append(feedback)
+        feedback = feedback1_dict.get(key)
+        feedback1_list.append(feedback)
     return render_template('requested.html', count=len(feedback1_list), feedback1_list=feedback1_list)
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

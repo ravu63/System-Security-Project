@@ -5,8 +5,10 @@
 {% from "includes/_formHelper.html" import render_field %} 
 <h3>Retrieve Status</h3>
 <form method="POST" action="">
+{{ form.hidden_tag() }}
     <div class="form-group">
-        {{ render_field(form.SUI_CODE, class="form-control",style="width:20%") }}
+        <h4>Enter in the SUI:</h4>
+        {{ form.SUI_CODE }}
       </div>
       <input type="submit" value="Submit" class="btn btn-primary"/>
 </form>
