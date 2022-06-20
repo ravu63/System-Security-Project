@@ -389,65 +389,32 @@ def change_password(id):
 @app.route('/manageAccount/<id>/', methods=['GET', 'POST'])
 @login_required
 def manage_account(id):
-    update_customer_form = UpdateCustomerForm(request.form)
-    if request.method == 'POST' and update_customer_form.validate():
-        customer_dict = {}
-        db = shelve.open('signup.db', 'w')
-        customer_dict = db['Customers']
-
-        customer = customer_dict.get(id)
-        customer.set_name(update_customer_form.name.data)
-        customer.set_email(update_customer_form.email.data)
-        customer.set_phone(update_customer_form.phone.data)
-        customer.set_gender(update_customer_form.gender.data)
-        customer.set_birthdate(update_customer_form.birthdate.data)
-
-        db['Customers'] = customer_dict
-        db.close()
-
+    form = UpdateCustomerForm()
+    user = User.query.get_or_404(id)
+    if request.method == 'POST' and form.validate_on_submit():
+        user.name = request.form['name']
+        user.email = request.form['email']
+        # user.birthdate = int(date(request.form['birthdate']))
+        user.phone = request.form['phone']
+        user.gender = request.form['gender']
+        db.session.commit()
         return redirect(url_for('main'))
-    else:
-        users_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
 
-        customer = customer_dict.get(id)
-        update_customer_form.name.data = customer.get_name()
-        update_customer_form.email.data = customer.get_email()
-        update_customer_form.gender.data = customer.get_gender()
-        update_customer_form.phone.data = customer.get_phone()
-        update_customer_form.birthdate.data = customer.get_birthdate()
-
-    return render_template('manageAccount.html', form=update_customer_form)
+    return render_template('manageAccount.html', form=form)
 
 
 @app.route('/customerChangePass/<id>/', methods=['GET', 'POST'])
 @login_required
 def customer_change(id):
-    update_customer_form = ChangePassword(request.form)
-    if request.method == 'POST' and update_customer_form.validate():
-        customer_dict = {}
-        db = shelve.open('signup.db', 'w')
-        customer_dict = db['Customers']
-
-        customer = customer_dict.get(id)
-        customer.set_password(update_customer_form.password.data)
-
-        db['Customers'] = customer_dict
-        db.close()
-
+    form = UpdateCustomerForm2()
+    user = User.query.get_or_404(id)
+    if request.method == 'POST' and form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        user.password = hashed_password
+        db.session.commit()
         return redirect(url_for('main'))
-    else:
-        users_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
 
-        customer = customer_dict.get(id)
-        update_customer_form.password.data = customer.get_password()
-
-    return render_template('customerChangePass.html', form=update_customer_form)
+    return render_template('customerChangePass.html', form=form)
 
 
 
