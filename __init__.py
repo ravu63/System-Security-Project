@@ -327,6 +327,7 @@ def delete_admin(id):
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     logout_user()
+    session.pop('id',None)
     return redirect(url_for('home'))
 
 
@@ -393,6 +394,8 @@ def change_password(id):
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         user.password = hashed_password
         db.session.commit()
+        session.pop('email', None)
+        session.pop('otp',None)
         return redirect(url_for('login'))
     return render_template('ChangePassword.html', form=form)
 
