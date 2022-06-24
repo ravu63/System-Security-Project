@@ -6,7 +6,7 @@
 
 <h1 class="display-4">Update Admin</h1>
 
-<form method="POST" action="/updateAdmin/{{ user.id }}">
+<form method="POST" action="">
   {{ form.hidden_tag() }}
   <div class="form-group">
     {{ render_field(form.name, class="form-control",value=user.name) }}

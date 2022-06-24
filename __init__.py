@@ -20,7 +20,7 @@ from Currency import Currency
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
-import datetime
+from datetime import datetime
 import pytz
 
 app = Flask(__name__)
@@ -295,7 +295,8 @@ def customer_Admin(id):
     if request.method == 'POST' and form.validate_on_submit():
         user.name = request.form['name']
         user.email = request.form['email']
-        # user.birthdate = int(date(request.form['birthdate']))
+        birthdate = request.form['birthdate']
+        user.birthdate = datetime.strptime(birthdate, "%Y-%m-%d").date()
         user.phone = request.form['phone']
         user.gender = request.form['gender']
         db.session.commit()
@@ -409,7 +410,8 @@ def manage_account(id):
     if request.method == 'POST' and form.validate_on_submit():
         user.name = request.form['name']
         user.email = request.form['email']
-        # user.birthdate = int(date(request.form['birthdate']))
+        birthdate = request.form['birthdate']
+        user.birthdate=datetime.strptime(birthdate, "%Y-%m-%d").date()
         user.phone = request.form['phone']
         user.gender = request.form['gender']
         db.session.commit()
