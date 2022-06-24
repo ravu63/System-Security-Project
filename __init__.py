@@ -300,7 +300,6 @@ def customer_Admin(id):
         user.phone = request.form['phone']
         user.gender = request.form['gender']
         db.session.commit()
-        flash("User updated successfully!")
         return redirect(url_for('manage_admin'))
 
     return render_template('updateAdmin.html', form=form, user=user)
