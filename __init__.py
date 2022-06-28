@@ -242,6 +242,10 @@ def login():
             if user:
                 if bcrypt.check_password_hash(user.password, form.password.data):
                     login_user(user)
+                    if diff.days>=25:
+                        msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',recipients=[user.email])
+                        msg.body = 'Your password is expiring in {} days'.format(30-diff.days)
+                        mail.send(msg)
                     if user.role == 0:
                         session['id']=user.id
                         return redirect(url_for('main'))
