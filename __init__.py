@@ -248,9 +248,11 @@ def login():
                         mail.send(msg)
                     if user.role == 0:
                         session['id']=user.id
+                        session['role']=user.role
                         return redirect(url_for('main'))
                     else:
                         session['id'] = user.id
+                        session['role']=user.role
                         return redirect(url_for('dashboard'))
                 else:
                     flash(u'Invalid Email or Password')
@@ -278,6 +280,13 @@ def signup():
 @login_required
 def create_admin():
     form = CreateCustomerForm()
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role==1:
+        pass
+    else:
+        return redirect(url_for('main'))
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         today = date.today()
@@ -292,18 +301,39 @@ def create_admin():
 @app.route('/manageCustomer', methods=['GET', 'POST'])
 @login_required
 def manage_customers():
+    role=session['role']
+    if role!=1:
+        return redirect(url_for('main'))
+    elif role==1:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('manageCustomer.html', Users=User.query.all())
 
 
 @app.route('/manageAdmin', methods=['GET', 'POST'])
 @login_required
 def manage_admin():
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role==1:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('manageAdmin.html', Users=User.query.all())
 
 
 @app.route('/updateAdmin/<id>/', methods=['GET', 'POST'])
 @login_required
 def customer_Admin(id):
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role==1:
+        pass
+    else:
+        return redirect(url_for('main'))
     form = UpdateCustomerForm()
     user = User.query.get_or_404(id)
     if request.method == 'POST' and form.validate_on_submit():
@@ -322,6 +352,13 @@ def customer_Admin(id):
 @app.route('/deleteCustomer/<id>', methods=['POST'])
 @login_required
 def delete_customer(id):
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role==1:
+        pass
+    else:
+        return redirect(url_for('main'))
     user = User.query.get(id)
     db.session.delete(user)
     db.session.commit()
@@ -331,6 +368,13 @@ def delete_customer(id):
 @app.route('/deleteAdmin/<id>', methods=['POST'])
 @login_required
 def delete_admin(id):
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role==1:
+        pass
+    else:
+        return redirect(url_for('main'))
     user = User.query.get(id)
     db.session.delete(user)
     db.session.commit()
