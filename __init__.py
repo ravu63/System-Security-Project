@@ -20,7 +20,7 @@ from Currency import Currency
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
-from datetime import datetime
+from datetime import datetime, date
 import pytz
 
 app = Flask(__name__)
@@ -49,6 +49,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.Integer, nullable=False)
+    passwordChange=db.Column(db.Date, nullable=False)
 
 
 class Pawn(db.Model):
@@ -232,18 +233,25 @@ def page_not_found(e):
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        current=date.today()
         user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            if bcrypt.check_password_hash(user.password, form.password.data):
-                login_user(user)
-                if user.role == 0:
-                    session['id']=user.id
-                    return redirect(url_for('main'))
+        before=user.passwordChange
+        diff=current-before
+
+        if diff.days<30:
+            if user:
+                if bcrypt.check_password_hash(user.password, form.password.data):
+                    login_user(user)
+                    if user.role == 0:
+                        session['id']=user.id
+                        return redirect(url_for('main'))
+                    else:
+                        session['id'] = user.id
+                        return redirect(url_for('dashboard'))
                 else:
-                    session['id'] = user.id
-                    return redirect(url_for('dashboard'))
-            else:
-                flash(u'Invalid Email or Password')
+                    flash(u'Invalid Email or Password')
+        else:
+            flash(u'Password has expired. Please change password.')
     return render_template('login.html', form=form)
 
 
@@ -252,8 +260,9 @@ def signup():
     form = CreateCustomerForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today=date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
-                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0)
+                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0, passwordChange=today)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -267,8 +276,9 @@ def create_admin():
     form = CreateCustomerForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
-                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1)
+                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1, passwordChange=today)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('manage_admin'))
@@ -392,7 +402,9 @@ def change_password(id):
     user=User.query.filter_by(email=id).first()
     if request.method == 'POST' and form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
         user.password = hashed_password
+        user.passwordChange=today
         db.session.commit()
         session.pop('email', None)
         session.pop('otp',None)
@@ -427,7 +439,9 @@ def customer_change(id):
     user = User.query.get(id)
     if request.method == 'POST' and form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
         user.password = hashed_password
+        user.passwordChange=today
         db.session.commit()
         return redirect(url_for('main'))
 
