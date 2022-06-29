@@ -60,7 +60,30 @@
       <h5>Pawn Period</h5>
     {{ form.pawn_period}}
   </div>
-  
-  <input type="submit" value="Submit" class="btn btn-primary"/>
+    <div id="show" style="display: none" class="form-group">
+    <input type="submit" value="Submit" class="btn btn-primary"/>
+</div>
+    <form action="#">
+        <div id="lift">
+        <img src="{{url_for('static', filename='cap.jpeg')}}"><br>
+        <label for="captcha_code">Enter the Captcha Code:</label><br>
+          <input type="text" id="captcha_code" name="fname"><br>
+          <input type="button" NAME="button" value="Verify" onclick="process(this.form)">
+            </div>
+    </form>
+
 </form>
+    <script>
+    function process (form) {
+        var correct_captcha = {{ captcha_text | tojson }};
+        var response_captcha = form.fname.value;
+        if (correct_captcha===response_captcha) {
+        alert('Correct Captcha!');
+        document.getElementById("lift").style.display = "none";
+        document.getElementById("show").style.display = "block";
+    }   else{
+        alert('Wrong! Try again!')
+    }
+    }
+    </script>
 {% endblock %}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="database.db">
-  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.39">
+  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.40">
     <root id="1">
       <ServerVersion>3.36.0</ServerVersion>
     </root>
@@ -1367,6 +1367,7 @@
     <key id="491" parent="473">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
     <column id="492" parent="474" name="type">
       <DataType>text|0s</DataType>
@@ -1431,6 +1432,7 @@
     <key id="505" parent="475">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
+      <UnderlyingIndexColNames>id</UnderlyingIndexColNames>
     </key>
   </database-model>
 </dataSource>

@@ -1,6 +1,7 @@
 from currency_converter import CurrencyConverter
 import Loan
 import random
+import string
 import shelve
 import Plan
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -20,6 +21,7 @@ from Currency import Currency
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
+from captcha_generate import generate_captcha_image
 
 app = Flask(__name__)
 app.debug = True
@@ -36,6 +38,8 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
+
+# Start of database
 
 # Create table
 class User(db.Model, UserMixin):
@@ -69,7 +73,9 @@ class Pawn(db.Model):
 
 # end Create table
 
-# Forms
+# End of Database
+
+# Start of Forms
 # Joshua
 class CreateCustomerForm(FlaskForm):
     name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],
@@ -156,6 +162,7 @@ class PawnCreation(FlaskForm):
         if not contactnumber.data.isdigit():
             raise ValidationError("Your number should be in digits")
 
+
 class PawnStatus(FlaskForm):
     pawn_status = SelectField('Pawn Status', [validators.DataRequired()],
                               choices=[('Processing', 'Processing'), ('Picked Up', 'Picked Up'),
@@ -164,13 +171,16 @@ class PawnStatus(FlaskForm):
                                        ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='Processing')
     submit = SubmitField('Submit')
 
+
 class PawnRetrieval(FlaskForm):
     SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
     submit = SubmitField('Submit')
 
+
 class SearchSUI(FlaskForm):
     SUI_CODE = StringField('Enter in the SUI:', [validators.Length(min=1, max=9), validators.DataRequired()])
     submit = SubmitField('Submit')
+
 
 class filterStatus(FlaskForm):
     pawn_status = SelectField('Filter by Status:', [validators.DataRequired()],
@@ -180,10 +190,13 @@ class filterStatus(FlaskForm):
                                        ('Rejected', 'Rejected'), ('Successful', 'Successful')], default='')
     submit = SubmitField('Submit')
 
+
 # End of Ravu
 
 
-# End Forms
+# End of  Forms
+
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -814,6 +827,13 @@ def SUI_Shower():
 
 @app.route('/createPawn', methods=['GET', 'POST'])
 def createPawn():
+    length = 6
+    upper = string.ascii_uppercase
+    num = string.digits
+    all = upper + num
+    tmp = random.sample(all, length)
+    captcha_text = "".join(tmp)
+    generate_captcha_image(captcha_text)
     form = PawnCreation()
     if form.validate_on_submit():
         sample_string = 'abcdefpqrstuvwxy'  # define the specific string
@@ -828,7 +848,7 @@ def createPawn():
         db.session.add(new_record)
         db.session.commit()
         return redirect(url_for('SUI_Shower'))
-    return render_template('createPawn.html', form=form)
+    return render_template('createPawn.html', form=form, captcha_text=captcha_text)
 
 
 @app.route('/retrievePawn')
@@ -844,11 +864,10 @@ def delete_pawn(id):
     return redirect(url_for('retrieve_pawn'))
 
 
-
 @app.route('/viewpawn/<int:id>', methods=['GET', 'POST'])
 def view_pawn(id):
     pawn = Pawn.query.get(id)
-    return render_template('viewPawn.html', pawn = pawn)
+    return render_template('viewPawn.html', pawn=pawn)
 
 
 @app.route('/updatepawn/<int:id>/', methods=['GET', 'POST'])
@@ -879,7 +898,7 @@ def search_sui():
     if form.validate_on_submit():
         pawn = Pawn.query.filter_by(sui=form.SUI_CODE.data).first()
         if pawn:
-            return render_template('resultsSUI.html',pawn=pawn)
+            return render_template('resultsSUI.html', pawn=pawn)
         else:
             return render_template('noSUI.html')
 
@@ -891,7 +910,7 @@ def filter_status():
     form = filterStatus()
     if form.validate_on_submit():
         pawn = Pawn.query.filter_by(pawn_status=form.pawn_status.data).all()
-        return render_template('resultStatus.html',pawn=pawn)
+        return render_template('resultStatus.html', pawn=pawn)
 
     return render_template('filterStatus.html', form=form)
 
