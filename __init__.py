@@ -128,6 +128,10 @@ class UpdateCustomerForm2(FlaskForm):
     confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
     submit = SubmitField('Submit')
 
+class UpdateCustomerForm3(FlaskForm):
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    submit = SubmitField('Submit')
+
 # End of Joshua
 # Start of Ravu
 class PawnCreation(FlaskForm):
@@ -468,7 +472,6 @@ def manage_account(id):
     user = User.query.get(id)
     if request.method == 'POST' and form.validate_on_submit():
         user.name = request.form['name']
-        user.email = request.form['email']
         birthdate = request.form['birthdate']
         user.birthdate=datetime.strptime(birthdate, "%Y-%m-%d").date()
         user.phone = request.form['phone']
@@ -477,6 +480,27 @@ def manage_account(id):
         return redirect(url_for('main'))
 
     return render_template('manageAccount.html', form=form, user=user)
+
+@app.route('/ChangeEmail', methods=['GET', 'POST'])
+@login_required
+def email():
+    msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[session['email']])
+    msg.body = 'here is the link to change your email'.format()
+    mail.send(msg)
+
+
+@app.route('/customerChangeEmail/<id>/', methods=['GET', 'POST'])
+@login_required
+def customer_email(id):
+    id=session['id']
+    form = UpdateCustomerForm3()
+    user = User.query.get(id)
+    if request.method == 'POST' and form.validate_on_submit():
+        user.email =request.form['email']
+        db.session.commit()
+        return redirect(url_for('main'))
+
+    return render_template('changeEmail.html', form=form)
 
 
 @app.route('/customerChangePass/<id>/', methods=['GET', 'POST'])
