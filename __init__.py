@@ -22,6 +22,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
 from captcha_generate import generate_captcha_image
+import cv2
 
 app = Flask(__name__)
 app.debug = True
@@ -263,6 +264,7 @@ def signup():
 
     return render_template('signup.html', form=form)
 
+#Waiting For Joshua Approval to touch his db
 
 @app.route('/createAdmin', methods=['GET', 'POST'])
 @login_required
