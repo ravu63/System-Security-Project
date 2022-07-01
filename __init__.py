@@ -70,6 +70,12 @@ class Pawn(db.Model):
     sui = db.Column(db.String(10), nullable=False)
     pawn_status = db.Column(db.String(10), nullable=False)
 
+class Transaction(db.Model):
+    id = db.Column(db.Interger, primary_key=True)
+    name = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(30), nullable=False)
+
+
 
 # end Create table
 
