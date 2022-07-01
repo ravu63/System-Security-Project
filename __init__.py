@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
 from Forms import  OTPform, \
-    ChangePassword, SearchCustomerForm, CreateLoanForm, CreatePlanForm, PawnCreation, \
+     CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from flask_wtf import FlaskForm
@@ -24,7 +24,9 @@ from flask_bcrypt import Bcrypt
 from captcha_generate import generate_captcha_image
 from datetime import datetime, date
 import pytz
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
+s=URLSafeTimedSerializer('ThisIsASecret!')
 app = Flask(__name__)
 app.debug = True
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -498,23 +500,42 @@ def manage_account():
     return render_template('manageAccount.html', form=form,user=user)
 
 
-@app.route('/ChangeEmail', methods=['GET', 'POST'])
+@app.route('/changeEmail', methods=['GET', 'POST'])
 @login_required
 def email():
-    msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[session['email']])
-    msg.body = 'here is the link to change your email'.format()
+    id=session['id']
+    user=User.query.get(id)
+    email=user.email
+    token =s.dumps(email)
+    msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[email])
+    link=url_for('customer_email',token=token, _external=True)
+    msg.body = 'here is the link to change your email {}'.format(link)
     mail.send(msg)
+    return redirect(url_for('confirm'))
 
-@app.route('/customerChangeEmail', methods=['GET', 'POST'])
-def customer_email():
+@app.route('/changeEmailConfirm')
+def confirm():
+    return render_template('changeEmailLink.html')
+
+@app.route('/customerChangeEmail/<token>', methods=['GET', 'POST'])
+@login_required
+def customer_email(token):
+    try:
+        email=s.loads(token, max_age=20)
+    except SignatureExpired:
+        return redirect(url_for('expired'))
     id=session['id']
     form = UpdateCustomerForm3()
     user = User.query.get(id)
     if request.method == 'POST' and form.validate_on_submit():
         user.email =request.form['email']
         db.session.commit()
+        return redirect(url_for('main'))
     return render_template('changeEmail.html', form=form)
 
+@app.route('/expired')
+def expired():
+    return render_template('expired.html')
 
 @app.route('/customerChangePass', methods=['GET', 'POST'])
 @login_required
