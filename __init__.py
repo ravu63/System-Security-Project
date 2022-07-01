@@ -4,7 +4,7 @@ import random
 import string
 import shelve
 import Plan
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
 from Forms import  OTPform, \
@@ -26,6 +26,14 @@ from datetime import datetime, date
 import pytz
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 import cv2
+from azure.cognitiveservices.vision.face import FaceClient
+from msrest.authentication import CognitiveServicesCredentials
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+
+KEY = "8341c4d3ee5842ea9ab5a2f9192a020a"
+ENDPOINT = "https://radiant63.cognitiveservices.azure.com/"
+face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
+blob_service_client = BlobServiceClient.from_connection_string("DefaultEndpointsProtocol=https;AccountName=ravu63;AccountKey=Rb3XX8PGQswVKFQPNYGjh+d/1+s98EOyNvltfbuoL89v0c7HcTGa7bPykBuaD8A0FkEVWuNokhhn+AStJVn5+w==;EndpointSuffix=core.windows.net")
 
 s=URLSafeTimedSerializer('ThisIsASecret!')
 app = Flask(__name__)
@@ -303,10 +311,31 @@ def signup():
         db.session.commit()
         if new_user.TWOFAStatus == "None":
             return render_template('setup2FA.html')
-
     return render_template('signup.html', form=form)
+# Ravu Face Verification Shit
+camera = cv2.VideoCapture(0)
+def gen_frames():  
+    while True:
+        success, frame = camera.read()  # read the camera frame
+        if not success:
+            break
+        else:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
 
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/registerFace', methods=['GET', 'POST'])
+def registerFace():
+    return render_template('registerFace.html')
+
+# End of Ravu Face shit
 @app.route('/createAdmin', methods=['GET', 'POST'])
 @login_required
 def create_admin():
