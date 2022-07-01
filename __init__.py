@@ -539,7 +539,7 @@ def email():
     user=User.query.get(id)
     email=user.email
     token =s.dumps(email)
-    msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[email])
+    msg = Message('Changing Email', sender='radiantfinancenyp@gmail.com', recipients=[email])
     link=url_for('customer_email',token=token, _external=True)
     msg.body = 'here is the link to change your email {}'.format(link)
     mail.send(msg)
