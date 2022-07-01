@@ -253,7 +253,7 @@ def main():
     if role == 1 or role ==0:
         pass
     else:
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
     return render_template('main.html')
 
 
