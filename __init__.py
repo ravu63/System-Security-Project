@@ -491,6 +491,13 @@ def change_password():
 @app.route('/manageAccount', methods=['GET', 'POST'])
 @login_required
 def manage_account():
+    role = session['role']
+    if role != 1 or role != 0:
+        return redirect(url_for('main'))
+    elif role == 1 or role == 0:
+        pass
+    else:
+        return redirect(url_for('main'))
     id = session['id']
     form = UpdateCustomerForm()
     user = User.query.get(id)
@@ -510,6 +517,13 @@ def manage_account():
 @app.route('/changeEmail', methods=['GET', 'POST'])
 @login_required
 def email():
+    role = session['role']
+    if role != 1 or role != 0:
+        return redirect(url_for('main'))
+    elif role == 1 or role == 0:
+        pass
+    else:
+        return redirect(url_for('main'))
     id=session['id']
     user=User.query.get(id)
     email=user.email
@@ -521,12 +535,27 @@ def email():
     return redirect(url_for('confirm'))
 
 @app.route('/changeEmailConfirm')
+@login_required
 def confirm():
+    role = session['role']
+    if role != 1 or role != 0:
+        return redirect(url_for('main'))
+    elif role == 1 or role == 0:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('changeEmailLink.html')
 
 @app.route('/customerChangeEmail/<token>', methods=['GET', 'POST'])
 @login_required
 def customer_email(token):
+    role = session['role']
+    if role != 1 or role != 0:
+        return redirect(url_for('main'))
+    elif role == 1 or role == 0:
+        pass
+    else:
+        return redirect(url_for('main'))
     try:
         email=s.loads(token, max_age=20)
     except SignatureExpired:
@@ -541,12 +570,27 @@ def customer_email(token):
     return render_template('changeEmail.html', form=form)
 
 @app.route('/expired')
+@login_required
 def expired():
+    role = session['role']
+    if role != 1 or role != 0:
+        return redirect(url_for('main'))
+    elif role == 1 or role == 0:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('expired.html')
 
 @app.route('/customerChangePass', methods=['GET', 'POST'])
 @login_required
 def customer_change():
+    role = session['role']
+    if role != 1 or role != 0:
+        return redirect(url_for('main'))
+    elif role == 1 or role == 0:
+        pass
+    else:
+        return redirect(url_for('main'))
     id = session['id']
     form = UpdateCustomerForm2()
     user = User.query.get(id)
@@ -565,18 +609,31 @@ def customer_change():
 
 
 @app.route('/noCustomer')
+@login_required
 def no_customer():
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('noCustomer.html')
 
 
 @app.route('/noRecord')
+@app.route
 def no_record():
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('noRecord.html')
 
 
-@app.route('/showCustomer')
-def show_customer():
-    return render_template('showCustomer.html')
 
 
 
