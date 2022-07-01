@@ -22,3 +22,7 @@ sqlparse==0.4.2
 Werkzeug==2.1.1
 WTForms==3.0.1
 flask_mail==0.9.0
+captcha==0.4
+azure-storage-blob==12.12.0
+azure-cognitiveservices-vision-face==0.6.0
+opencv-python==4.6.0.66
