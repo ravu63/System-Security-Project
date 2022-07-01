@@ -7,7 +7,7 @@ import Plan
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
-from Forms import UpdateCustomerForm2, ForgetPassword, OTPform, \
+from Forms import  OTPform, \
     ChangePassword, SearchCustomerForm, CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
@@ -22,6 +22,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
 from captcha_generate import generate_captcha_image
+from datetime import datetime, date
+import pytz
 
 app = Flask(__name__)
 app.debug = True
@@ -31,7 +33,7 @@ app.config['MAIL_DEBUG'] = True
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
-app.config['MAIL_PASSWORD'] = "Radiant12345"
+app.config['MAIL_PASSWORD'] = "xepjuxdlrsmpcnxk"
 mail = Mail(app)
 bcrypt = Bcrypt(app)
 
@@ -51,6 +53,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.Integer, nullable=False)
+    passwordChange = db.Column(db.Date, nullable=False)
 
 
 class Pawn(db.Model):
@@ -78,20 +81,15 @@ class Pawn(db.Model):
 # Start of Forms
 # Joshua
 class CreateCustomerForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],
-                       render_kw={"placeholder": "Name:"})
-    gender = SelectField('Gender', [validators.DataRequired()],
-                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='',
-                         render_kw={"placeholder": "Gender:"})
-    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],
-                        render_kw={"placeholder": "Phone Number:"})
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()])
+    gender = SelectField('Gender', [validators.DataRequired()],choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='')
+    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
-                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')],
-                             render_kw={"placeholder": "Password:"})
-    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()],
-                                    render_kw={"placeholder": "Confirm Password:"})
+                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')]
+                             )
+    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
     submit = SubmitField('Register')
 
     def validate_phone(self, phone):
@@ -105,26 +103,38 @@ class CreateCustomerForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
-    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()],
-                             render_kw={"placeholder": "Password:"})
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired()])
     submit = SubmitField('Login')
 
 
 class UpdateCustomerForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()],
-                       render_kw={"placeholder": "Name:"})
-    gender = SelectField('Gender', [validators.DataRequired()],
-                         choices=[('F', 'Female'), ('M', 'Male')], default='', render_kw={"placeholder": "Gender:"})
-    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()],
-                        render_kw={"placeholder": "Phone Number:"})
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()])
+    gender = SelectField('Gender', [validators.DataRequired()],choices=[('F', 'Female'), ('M', 'Male')], default='')
+    phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()], render_kw={"placeholder": "Email:"})
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     submit = SubmitField('Update')
 
     def validate_phone(self, phone):
         if not phone.data[1:8].isdigit():
             raise ValidationError("Phone number must not contain letters")
+
+class ForgetPassword(FlaskForm):
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    submit = SubmitField('Submit')
+
+class UpdateCustomerForm2(FlaskForm):
+    password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
+                                          validators.EqualTo('confirmpassword', message='Error:Passwords must match')])
+    confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
+    submit = SubmitField('Submit')
+
+class UpdateCustomerForm3(FlaskForm):
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    submit = SubmitField('Submit')
+
+
 
 
 # End of Joshua
@@ -234,19 +244,38 @@ def dashboard():
 def page_not_found(e):
     return render_template('error404.html'), 404
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        current=date.today()
         user = User.query.filter_by(email=form.email.data).first()
+
         if user:
-            if bcrypt.check_password_hash(user.password, form.password.data):
-                login_user(user)
-                if user.role == 0:
-                    return redirect(url_for('main'))
+            before = user.passwordChange
+            diff = current - before
+
+            if diff.days < 30:
+                if bcrypt.check_password_hash(user.password, form.password.data):
+                    login_user(user)
+                    if diff.days>=25:
+                        msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',recipients=[user.email])
+                        msg.body = 'Your password is expiring in {} days'.format(30-diff.days)
+                        mail.send(msg)
+                    if user.role == 0:
+                        session['id']=user.id
+                        session['role']=user.role
+                        return redirect(url_for('main'))
+                    else:
+                        session['id'] = user.id
+                        session['role']=user.role
+                        return redirect(url_for('dashboard'))
                 else:
-                    return redirect(url_for('dashboard'))
+                    flash(u'Invalid Email or Password')
+            else:
+                flash(u'Password has expired. Please change password.')
+        else:
+            flash(u'Invalid Email or Password')
     return render_template('login.html', form=form)
 
 
@@ -255,8 +284,10 @@ def signup():
     form = CreateCustomerForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
-                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0)
+                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
+                        passwordChange=today)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -268,10 +299,18 @@ def signup():
 @login_required
 def create_admin():
     form = CreateCustomerForm()
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
-                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1)
+                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1, passwordChange=today)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('manage_admin'))
@@ -281,28 +320,49 @@ def create_admin():
 @app.route('/manageCustomer', methods=['GET', 'POST'])
 @login_required
 def manage_customers():
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('manageCustomer.html', Users=User.query.all())
 
 
 @app.route('/manageAdmin', methods=['GET', 'POST'])
 @login_required
 def manage_admin():
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('manageAdmin.html', Users=User.query.all())
 
 
 @app.route('/updateAdmin/<id>/', methods=['GET', 'POST'])
 @login_required
 def customer_Admin(id):
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     form = UpdateCustomerForm()
     user = User.query.get_or_404(id)
     if request.method == 'POST' and form.validate_on_submit():
         user.name = request.form['name']
         user.email = request.form['email']
-        # user.birthdate = int(date(request.form['birthdate']))
+        birthdate = request.form['birthdate']
+        user.birthdate = datetime.strptime(birthdate, "%Y-%m-%d").date()
         user.phone = request.form['phone']
         user.gender = request.form['gender']
         db.session.commit()
-        flash("User updated successfully!")
         return redirect(url_for('manage_admin'))
 
     return render_template('updateAdmin.html', form=form, user=user)
@@ -311,6 +371,13 @@ def customer_Admin(id):
 @app.route('/deleteCustomer/<id>', methods=['POST'])
 @login_required
 def delete_customer(id):
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     user = User.query.get(id)
     db.session.delete(user)
     db.session.commit()
@@ -320,6 +387,13 @@ def delete_customer(id):
 @app.route('/deleteAdmin/<id>', methods=['POST'])
 @login_required
 def delete_admin(id):
+    role = session['role']
+    if role != 1:
+        return redirect(url_for('main'))
+    elif role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     user = User.query.get(id)
     db.session.delete(user)
     db.session.commit()
@@ -329,38 +403,37 @@ def delete_admin(id):
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
+    session.pop('id', None)
     logout_user()
     return redirect(url_for('home'))
 
 
 @app.route('/forgotPassword', methods=['POST', 'GET'])
 def forgot_password():
-    login_form = ForgetPassword(request.form)
+    form = ForgetPassword()
     try:
         if request.method == 'POST':
-            users = shelve.open('signup.db', 'r')
-            email = request.form['email']
-            users_dict = users['Customers']
-            users_keys = list(users_dict.keys())
-            user = users_dict[email]
-            if user.get_email() == email:
-                session['id'] = user.get_email()
-                users.close()
+            email = User.query.filter_by(email=form.email.data).first()
+            if email:
+                emaildata = request.form['email']
+                session['email'] = emaildata
                 return redirect(url_for('getOTP'))
             else:
                 flash(u'Invalid email provided')
     except:
         flash(u'Invalid email provided')
 
-    return render_template('forgotPassword.html', form=login_form)
+    return render_template('forgotPassword.html', form=form)
 
 
 @app.route('/getOTP', methods=['POST', 'GET'])
 def getOTP():
     if request.method == 'POST':
         otp = random.randint(1111, 9999)
+        then = datetime.now()
+        session['time'] = then
         session['otp'] = otp
-        msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[session['id']])
+        msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[session['email']])
         msg.body = 'here is your OTP:{}'.format(otp)
         mail.send(msg)
         return redirect(url_for('OTP'))
@@ -370,152 +443,97 @@ def getOTP():
 @app.route('/OTP', methods=['POST', 'GET'])
 def OTP():
     login_form = OTPform(request.form)
+    then = session['time']
     if request.method == 'POST':
         otp = session['otp']
         otp2 = int(request.form['otp3'])
         if otp == otp2:
-            return redirect(url_for('change_password', id=id))
+            now = datetime.now()
+            utc = pytz.UTC
+            now = utc.localize(now)
+            current = (now - then).total_seconds()
+            if current < 180:
+                return redirect(url_for('change_password', id=id))
+            else:
+                flash(u'OTP has expired please retry again.')
         else:
             flash(u'Invalid OTP provided')
     return render_template('OTP.html', form=login_form)
 
 
-@app.route('/changePassword/<id>', methods=['POST', 'GET'])
-def change_password(id):
-    update_customer_form = UpdateCustomerForm2(request.form)
-    id = session['id']
-
-    if request.method == 'POST' and update_customer_form.validate():
-        customer_dict = {}
-        db = shelve.open('signup.db', 'w')
-        customer_dict = db['Customers']
-
-        customer = customer_dict.get(id)
-        customer.set_password(update_customer_form.password.data)
-
-        db['Customers'] = customer_dict
-        db.close()
+@app.route('/changePassword', methods=['POST', 'GET'])
+def change_password():
+    form = UpdateCustomerForm2()
+    id = session['email']
+    user = User.query.filter_by(email=id).first()
+    if request.method == 'POST' and form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
+        user.password = hashed_password
+        user.passwordChange = today
+        db.session.commit()
+        session.pop('email', None)
+        session.pop('otp', None)
 
         return redirect(url_for('login'))
-    return render_template('customerChangePass.html', form=update_customer_form)
+    return render_template('customerChangePass.html', form=form)
 
 
-@app.route('/manageAccount/<id>/', methods=['GET', 'POST'])
+@app.route('/manageAccount', methods=['GET', 'POST'])
 @login_required
-def manage_account(id):
-    update_customer_form = UpdateCustomerForm(request.form)
-    if request.method == 'POST' and update_customer_form.validate():
-        customer_dict = {}
-        db = shelve.open('signup.db', 'w')
-        customer_dict = db['Customers']
-
-        customer = customer_dict.get(id)
-        customer.set_name(update_customer_form.name.data)
-        customer.set_email(update_customer_form.email.data)
-        customer.set_phone(update_customer_form.phone.data)
-        customer.set_gender(update_customer_form.gender.data)
-        customer.set_birthdate(update_customer_form.birthdate.data)
-
-        db['Customers'] = customer_dict
-        db.close()
+def manage_account():
+    id = session['id']
+    form = UpdateCustomerForm()
+    user = User.query.get(id)
+    if request.method == 'POST' and form.validate_on_submit():
+        user.name = request.form['name']
+        birthdate = request.form['birthdate']
+        user.birthdate = datetime.strptime(birthdate, "%Y-%m-%d").date()
+        user.phone = request.form['phone']
+        user.gender = request.form['gender']
+        db.session.commit()
 
         return redirect(url_for('main'))
-    else:
-        users_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
 
-        customer = customer_dict.get(id)
-        update_customer_form.name.data = customer.get_name()
-        update_customer_form.email.data = customer.get_email()
-        update_customer_form.gender.data = customer.get_gender()
-        update_customer_form.phone.data = customer.get_phone()
-        update_customer_form.birthdate.data = customer.get_birthdate()
-
-    return render_template('manageAccount.html', form=update_customer_form)
+    return render_template('manageAccount.html', form=form,user=user)
 
 
-@app.route('/customerChangePass/<id>/', methods=['GET', 'POST'])
+@app.route('/ChangeEmail', methods=['GET', 'POST'])
 @login_required
-def customer_change(id):
-    update_customer_form = ChangePassword(request.form)
-    if request.method == 'POST' and update_customer_form.validate():
-        customer_dict = {}
-        db = shelve.open('signup.db', 'w')
-        customer_dict = db['Customers']
+def email():
+    msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com', recipients=[session['email']])
+    msg.body = 'here is the link to change your email'.format()
+    mail.send(msg)
 
-        customer = customer_dict.get(id)
-        customer.set_password(update_customer_form.password.data)
+@app.route('/customerChangeEmail', methods=['GET', 'POST'])
+def customer_email():
+    id=session['id']
+    form = UpdateCustomerForm3()
+    user = User.query.get(id)
+    if request.method == 'POST' and form.validate_on_submit():
+        user.email =request.form['email']
+        db.session.commit()
+    return render_template('changeEmail.html', form=form)
 
-        db['Customers'] = customer_dict
-        db.close()
 
+@app.route('/customerChangePass', methods=['GET', 'POST'])
+@login_required
+def customer_change():
+    id = session['id']
+    form = UpdateCustomerForm2()
+    user = User.query.get(id)
+    if request.method == 'POST' and form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
+        user.password = hashed_password
+        user.passwordChange = today
+        db.session.commit()
         return redirect(url_for('main'))
-    else:
-        users_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
-
-        customer = customer_dict.get(id)
-        update_customer_form.password.data = customer.get_password()
-
-    return render_template('customerChangePass.html', form=update_customer_form)
+    return render_template('customerChangePass.html', form=form)
 
 
-@app.route('/searchCustomer', methods=['GET', 'POST'])
-@login_required
-def search_customer():
-    search_customer_form = SearchCustomerForm(request.form)
-    if request.method == 'POST' and search_customer_form.validate():
-        search = search_customer_form.searchCustomer.data
-        customer_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
-
-        customer_list = []
-        for key in customer_dict:
-            customer = customer_dict.get(key)
-            if search in customer.get_email():
-                if customer.get_role() == 0:
-                    customer_list.append(customer)
-            # else:
-            # continue
-
-        if len(customer_list) > 0:
-            return render_template('showCustomer.html', count=len(customer_list), customer_list=customer_list)
-        else:
-            return redirect(url_for('no_customer'))
-    return render_template('searchCustomer.html', form=search_customer_form)
 
 
-@app.route('/searchAdmin', methods=['GET', 'POST'])
-@login_required
-def search_admin():
-    search_customer_form = SearchCustomerForm(request.form)
-    if request.method == 'POST' and search_customer_form.validate():
-        search = search_customer_form.searchCustomer.data
-        customer_dict = {}
-        db = shelve.open('signup.db', 'r')
-        customer_dict = db['Customers']
-        db.close()
-
-        customer_list = []
-        for key in customer_dict:
-            customer = customer_dict.get(key)
-            if search in customer.get_email():
-                if customer.get_role() == 1:
-                    customer_list.append(customer)
-            # else:
-            # continue
-
-        if len(customer_list) > 0:
-            return render_template('showAdmin.html', count=len(customer_list), customer_list=customer_list)
-        else:
-            return redirect(url_for('no_customer'))
-    return render_template('searchCustomer.html', form=search_customer_form)
 
 
 @app.route('/noCustomer')
@@ -532,71 +550,6 @@ def no_record():
 def show_customer():
     return render_template('showCustomer.html')
 
-
-@app.route('/customerStuff', methods=['GET', 'POST'])
-def customer_stuff():
-    search_customer_form = SearchCustomerForm(request.form)
-    if request.method == 'POST' and search_customer_form.validate():
-        number = []
-        searchCustomer = search_customer_form.searchCustomer.data
-        # transactions = shelve.open('transactions')
-        # transList = list(transactions.keys())
-        # transactions.close()
-        # trans = []
-        # for id in transList:
-        #   if transList.getEmail()==searchCustomer:
-        #      trans.append(transactions[id])
-        #     number.append('1')
-        # else:
-        #   continue
-
-        # transaction_dict={}
-        # trans=shelve.open('transactions','r')
-        # transaction_dict=trans['Transaction']
-        # trans.close()
-        #
-        # transaction_list=[]
-        # for key in transaction_dict:
-        #     transaction=transaction_dict.get(key)
-        #     if transaction.get_email()==searchCustomer:
-        #         transaction_list.append(transaction)
-        #         number.append('1')
-        #     else:
-        #         continue
-
-        loan_dict = {}
-        loan = shelve.open('loan.db', 'r')
-        loan_dict = loan['Loans']
-        loan.close()
-
-        loan_list = []
-        for key in loan_dict:
-            loan = loan_dict.get(key)
-            if loan.get_loan_email() == searchCustomer:
-                loan_list.append(loan)
-                number.append('1')
-            else:
-                continue
-
-        pawn_dict = {}
-        pawn = shelve.open('pawn1.db', 'r')
-        pawn_dict = pawn['Pawns']
-        pawn.close()
-
-        pawn_list = []
-        for key in pawn_dict:
-            pawn = pawn_dict.get(key)
-            if pawn.get_email() == searchCustomer:
-                pawn_list.append(pawn)
-                number.append('1')
-            else:
-                continue
-
-        if len(number) > 0:
-            return render_template("customerStuff.html", count=len(number), loan_list=loan_list, pawn_dict=pawn_dict)
-        else:
-            return redirect(url_for('no_record'))
-    return render_template('searchStuff.html', form=search_customer_form)
 
 
 # Joshua
