@@ -249,12 +249,22 @@ def home():
 @app.route('/main', methods=['GET', 'POST'])
 @login_required
 def main():
+    role = session['role']
+    if role == 1 or role ==0:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('main.html')
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    role = session['role']
+    if role == 1:
+        pass
+    else:
+        return redirect(url_for('main'))
     return render_template('dashboard.html')
 
 
@@ -306,44 +316,20 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today,TWOFAStatus = "None")
+                        passwordChange=today)
         db.session.add(new_user)
         db.session.commit()
-        if new_user.TWOFAStatus == "None":
-            return render_template('setup2FA.html')
+        return redirect(url_for('login'))
+
     return render_template('signup.html', form=form)
-# Ravu Face Verification Shit
-camera = cv2.VideoCapture(0)
-def gen_frames():  
-    while True:
-        success, frame = camera.read()  # read the camera frame
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
 
 
-@app.route('/video_feed')
-def video_feed():
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-@app.route('/registerFace', methods=['GET', 'POST'])
-def registerFace():
-    return render_template('registerFace.html')
-
-# End of Ravu Face shit
 @app.route('/createAdmin', methods=['GET', 'POST'])
 @login_required
 def create_admin():
     form = CreateCustomerForm()
     role = session['role']
-    if role != 1:
-        return redirect(url_for('main'))
-    elif role == 1:
+    if role == 1:
         pass
     else:
         return redirect(url_for('main'))
@@ -362,9 +348,7 @@ def create_admin():
 @login_required
 def manage_customers():
     role = session['role']
-    if role != 1:
-        return redirect(url_for('main'))
-    elif role == 1:
+    if role == 1:
         pass
     else:
         return redirect(url_for('main'))
@@ -375,9 +359,7 @@ def manage_customers():
 @login_required
 def manage_admin():
     role = session['role']
-    if role != 1:
-        return redirect(url_for('main'))
-    elif role == 1:
+    if role == 1:
         pass
     else:
         return redirect(url_for('main'))
@@ -388,9 +370,7 @@ def manage_admin():
 @login_required
 def customer_Admin(id):
     role = session['role']
-    if role != 1:
-        return redirect(url_for('main'))
-    elif role == 1:
+    if role == 1:
         pass
     else:
         return redirect(url_for('main'))
@@ -413,9 +393,7 @@ def customer_Admin(id):
 @login_required
 def delete_customer(id):
     role = session['role']
-    if role != 1:
-        return redirect(url_for('main'))
-    elif role == 1:
+    if role == 1:
         pass
     else:
         return redirect(url_for('main'))
@@ -429,9 +407,7 @@ def delete_customer(id):
 @login_required
 def delete_admin(id):
     role = session['role']
-    if role != 1:
-        return redirect(url_for('main'))
-    elif role == 1:
+    if role ==1:
         pass
     else:
         return redirect(url_for('main'))
@@ -524,12 +500,10 @@ def change_password():
 @login_required
 def manage_account():
     role = session['role']
-    if role != 1 or role != 0:
-        return redirect(url_for('main'))
-    elif role == 1 or role == 0:
+    if role == 1 or role == 0:
         pass
     else:
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
     id = session['id']
     form = UpdateCustomerForm()
     user = User.query.get(id)
@@ -550,12 +524,10 @@ def manage_account():
 @login_required
 def email():
     role = session['role']
-    if role != 1 or role != 0:
-        return redirect(url_for('main'))
-    elif role == 1 or role == 0:
+    if role == 1 or role == 0:
         pass
     else:
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
     id=session['id']
     user=User.query.get(id)
     email=user.email
@@ -570,24 +542,20 @@ def email():
 @login_required
 def confirm():
     role = session['role']
-    if role != 1 or role != 0:
-        return redirect(url_for('main'))
-    elif role == 1 or role == 0:
+    if role == 1 or role == 0:
         pass
     else:
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
     return render_template('changeEmailLink.html')
 
 @app.route('/customerChangeEmail/<token>', methods=['GET', 'POST'])
 @login_required
 def customer_email(token):
     role = session['role']
-    if role != 1 or role != 0:
-        return redirect(url_for('main'))
-    elif role == 1 or role == 0:
+    if role==1 or role ==0:
         pass
     else:
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
     try:
         email=s.loads(token, max_age=20)
     except SignatureExpired:
@@ -605,24 +573,20 @@ def customer_email(token):
 @login_required
 def expired():
     role = session['role']
-    if role != 1 or role != 0:
-        return redirect(url_for('main'))
-    elif role == 1 or role == 0:
+    if role == 1 or role == 0:
         pass
     else:
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
     return render_template('expired.html')
 
 @app.route('/customerChangePass', methods=['GET', 'POST'])
 @login_required
 def customer_change():
     role = session['role']
-    if role != 1 or role != 0:
-        return redirect(url_for('main'))
-    elif role == 1 or role == 0:
+    if role == 1 or role == 0:
         pass
     else:
-        return redirect(url_for('main'))
+        redirect(url_for('home'))
     id = session['id']
     form = UpdateCustomerForm2()
     user = User.query.get(id)
@@ -644,12 +608,10 @@ def customer_change():
 @login_required
 def no_customer():
     role = session['role']
-    if role != 1:
-        return redirect(url_for('main'))
-    elif role == 1:
+    if role == 1 or role == 0:
         pass
     else:
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
     return render_template('noCustomer.html')
 
 
@@ -657,14 +619,11 @@ def no_customer():
 @app.route
 def no_record():
     role = session['role']
-    if role != 1:
-        return redirect(url_for('main'))
-    elif role == 1:
+    if role == 1 or role == 0:
         pass
     else:
-        return redirect(url_for('main'))
+        return redirect(url_for('home'))
     return render_template('noRecord.html')
-
 
 
 
