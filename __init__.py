@@ -25,6 +25,7 @@ from captcha_generate import generate_captcha_image
 from datetime import datetime, date
 import pytz
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+import cv2
 
 s=URLSafeTimedSerializer('ThisIsASecret!')
 app = Flask(__name__)
@@ -56,6 +57,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.Integer, nullable=False)
     passwordChange = db.Column(db.Date, nullable=False)
+    TWOFAStatus = db.Column(db.String(30), nullable=False)
 
 
 class Pawn(db.Model):
@@ -76,11 +78,11 @@ class Pawn(db.Model):
     pawn_status = db.Column(db.String(10), nullable=False)
 
 class Transaction(db.Model):
-    id = db.Column(db.Interger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(30), nullable=False)
     address = db.Column(db.String(100), nullable=False)
-    city = db.Column(db.String(min=30,max=100), nullable=False)
+    city = db.Column(db.String(100), nullable=False)
 
 
 # end Create table
@@ -296,10 +298,11 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today)
+                        passwordChange=today,TWOFAStatus = "None")
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('login'))
+        if new_user.TWOFAStatus == "None":
+            return render_template('setup2FA.html')
 
     return render_template('signup.html', form=form)
 
