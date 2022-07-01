@@ -65,6 +65,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.Integer, nullable=False)
     passwordChange = db.Column(db.Date, nullable=False)
+    passAttempt=(db.Column(db.Integer, nullable=False))
     TWOFAStatus = db.Column(db.String(30), nullable=False)
 
 
@@ -280,31 +281,36 @@ def login():
         current=date.today()
         user = User.query.filter_by(email=form.email.data).first()
 
-        if user:
-            before = user.passwordChange
-            diff = current - before
-
-            if diff.days < 30:
-                if bcrypt.check_password_hash(user.password, form.password.data):
-                    login_user(user)
-                    if diff.days>=25:
-                        msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',recipients=[user.email])
-                        msg.body = 'Your password is expiring in {} days'.format(30-diff.days)
-                        mail.send(msg)
-                    if user.role == 0:
-                        session['id']=user.id
-                        session['role']=user.role
-                        return redirect(url_for('main'))
-                    else:
-                        session['id'] = user.id
-                        session['role']=user.role
-                        return redirect(url_for('dashboard'))
-                else:
-                    flash(u'Invalid Email or Password')
-            else:
-                flash(u'Password has expired. Please change password.')
+        if user.passAttempt > 3:
+            flash(u'Too many failed password attepmts. Please reset password.')
         else:
-            flash(u'Invalid Email or Password')
+            if user:
+                before = user.passwordChange
+                diff = current - before
+
+                if diff.days < 30:
+                    if bcrypt.check_password_hash(user.password, form.password.data):
+                        login_user(user)
+                        if diff.days>=25:
+                            msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',recipients=[user.email])
+                            msg.body = 'Your password is expiring in {} days'.format(30-diff.days)
+                            mail.send(msg)
+                        if user.role == 0:
+                            session['id']=user.id
+                            session['role']=user.role
+                            return redirect(url_for('main'))
+                        else:
+                            session['id'] = user.id
+                            session['role']=user.role
+                            return redirect(url_for('dashboard'))
+                    else:
+                        user.passAttempt+=1
+                        db.session.commit()
+                        flash(u'Invalid Email or Password')
+                else:
+                    flash(u'Password has expired. Please change password.')
+            else:
+                flash(u'Invalid Email or Password')
     return render_template('login.html', form=form)
 
 
@@ -316,7 +322,7 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today)
+                        passwordChange=today, passAttempt=0,TWOFAStatus='idk')
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -337,7 +343,7 @@ def create_admin():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
-                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1, passwordChange=today)
+                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1, passwordChange=today, passAttempt=0,TWOFAStatus='idk')
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('manage_admin'))
@@ -488,6 +494,7 @@ def change_password():
         today = date.today()
         user.password = hashed_password
         user.passwordChange = today
+        user.passAttempt=0
         db.session.commit()
         session.pop('email', None)
         session.pop('otp', None)
@@ -595,6 +602,7 @@ def customer_change():
         today = date.today()
         user.password = hashed_password
         user.passwordChange = today
+        user.passAttempt=0
         db.session.commit()
         return redirect(url_for('main'))
     return render_template('customerChangePass.html', form=form)
