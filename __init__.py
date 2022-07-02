@@ -780,27 +780,25 @@ def loans():
     return render_template('Loan.html', count=len(plans_list), plans_lists=plans_list)
 
 
+# class LoanData(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     first_name = db.Column(db.String(20), nullable=False)
+#     last_name = db.Column(db.String(20), nullable=False)
+#     amount = db.Column(db.Integer, nullable=False)
+#     email = db.Column(db.String(100), nullable=False)
+
+
 @app.route('/createLoan.html', methods=['GET', 'POST'])
 def create_loan():
     create_loan_form = CreateLoanForm(request.form)
-    if request.method == "POST" and create_loan_form.validate():
-        loans_dict = {}
-        db = shelve.open('Loan.db', 'c')
-        print("User successfully saved")
-        try:
-            loans_dict = db['Loans']
-        except:
-            print("Error in retrieving Users from user.db.")
-        loanentry = Loan.Loan(create_loan_form.first_name.data,
-                              create_loan_form.last_name.data,
-                              create_loan_form.Amount.data,
-                              create_loan_form.email.data,
-                              )
-        loans_dict[loanentry.get_loan_id()] = loanentry
-        db['Loans'] = loans_dict
-        db.close()
-        print("user saved with {0} as Loan Id".format(loanentry.get_loan_id()))
-        return redirect(url_for('retrieve_loans'))
+    if request.method == 'POST' and create_loan_form.validate():
+        loanentry = PlanData(first_name=create_loan_form.first_name.data,
+                             last_name=create_loan_form.last_name.data,
+                             amount=create_loan_form.Amount.data,
+                             email=create_loan_form.email.data)
+        db.session.add(loanentry)
+        db.session.commit()
+        return redirect(url_for('retrieve_loan'))
     return render_template('createLoan.html', form=create_loan_form)
 
 
@@ -869,26 +867,14 @@ def delete_loan(id):
 def create_plan():
     create_plan_form = CreatePlanForm(request.form)
     if request.method == 'POST' and create_plan_form.validate():
-        plans_dict = {}
-        db = shelve.open('Plans.db', 'c')
-        print("User successfully saved")
-        try:
-            plans_dict = db['Plans']
-        except:
-            print("Error in retrieving Users from Plans.db.")
-        planentry = Plan.Plan(create_plan_form.Plan_name.data,
-                              create_plan_form.Plan_Des.data,
-                              create_plan_form.Plan_interest.data, )
-        plans_dict[planentry.get_loan_plan_id()] = planentry
-        db['Plans'] = plans_dict
-        db.close()
-        print("Plan saved with {0} as Plan Id".format(planentry.get_loan_plan_id()))
-        flash('Document uploaded successfully.')
-
+        planentry = PlanData(Plan_Name=create_plan_form.Plan_name.data,
+                             Plan_descripion=create_plan_form.Plan_Des.data,
+                             Plan_interest=create_plan_form.Plan_interest.data)
+        db.session.add(planentry)
+        db.session.commit()
         return redirect(url_for('retrieve_plan'))
 
     return render_template('createPlan.html', form=create_plan_form)
-
 
 @app.route('/retrievePlan.html')
 def retrieve_plan():
