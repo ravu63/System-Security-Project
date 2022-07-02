@@ -305,11 +305,17 @@ def login():
                         if user.role == 0:
                             session['id'] = user.id
                             session['role'] = user.role
+                            user.passAttempt=0
+                            db.session.commit()
                             return redirect(url_for('main'))
-                        else:
+                        elif user.role==1:
                             session['id'] = user.id
                             session['role'] = user.role
+                            user.passAttempt = 0
+                            db.session.commit()
                             return redirect(url_for('dashboard'))
+                        else:
+                            return redirect(url_for('home'))
                     else:
                         user.passAttempt += 1
                         db.session.commit()
