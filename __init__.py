@@ -794,19 +794,19 @@ def create_loan():
     return render_template('createLoan.html', form=create_loan_form)
 
 
-@app.route('/retrieveLoan.html')
-def retrieve_loans():
-    loans_dict = {}
-    db = shelve.open('Loan.db', 'r')
-    loans_dict = db['Loans']
-    db.close()
-
-    loans_list = []
-    for key in loans_dict:
-        loan = loans_dict.get(key)
-        loans_list.append(loan)
-
-    return render_template('retrieveLoan.html', count=len(loans_list), loans_lists=loans_list)
+# @app.route('/retrieveLoan.html')
+# def retrieve_loans():
+#     loans_dict = {}
+#     db = shelve.open('Loan.db', 'r')
+#     loans_dict = db['Loans']
+#     db.close()
+#
+#     loans_list = []
+#     for key in loans_dict:
+#         loan = loans_dict.get(key)
+#         loans_list.append(loan)
+#
+#     return render_template('retrieveLoan.html', count=len(loans_list), loans_lists=loans_list)
 
 
 @app.route('/updateLoan.html/<int:id>/', methods=['GET', 'POST'])
@@ -834,18 +834,18 @@ def update_loan(id):
         return render_template('updateLoan.html', form=update_loan_form)
 
 
-@app.route('/deleteLoan/<int:id>', methods=['POST'])
-def delete_loan(id):
-    loans_dict = {}
-    db = shelve.open('Loan.db', 'w')
-    loans_dict = db['Loans']
-
-    loans_dict.pop(id)
-
-    db['Loans'] = loans_dict
-    db.close()
-
-    return redirect(url_for('retrieve_Loans'))
+# @app.route('/deleteLoan/<int:id>', methods=['POST'])
+# def delete_loan(id):
+#     loans_dict = {}
+#     db = shelve.open('Loan.db', 'w')
+#     loans_dict = db['Loans']
+#
+#     loans_dict.pop(id)
+#
+#     db['Loans'] = loans_dict
+#     db.close()
+#
+#     return redirect(url_for('retrieve_Loans'))
 
 
 @app.route('/createPlan.html', methods=['GET', 'POST'])
@@ -862,19 +862,19 @@ def create_plan():
     return render_template('createPlan.html', form=create_plan_form)
 
 
-@app.route('/retrievePlan.html')
-def retrieve_plan():
-    plans_dict = {}
-    db = shelve.open('Plans.db', 'r')
-    plans_dict = db['Plans']
-    db.close()
-
-    plans_list = []
-    for key in plans_dict:
-        plan = plans_dict.get(key)
-        plans_list.append(plan)
-
-    return render_template('retrievePlan.html', count=len(plans_list), plans_lists=plans_list)
+# @app.route('/retrievePlan.html')
+# def retrieve_plan():
+#     plans_dict = {}
+#     db = shelve.open('Plans.db', 'r')
+#     plans_dict = db['Plans']
+#     db.close()
+#
+#     plans_list = []
+#     for key in plans_dict:
+#         plan = plans_dict.get(key)
+#         plans_list.append(plan)
+#
+#     return render_template('retrievePlan.html', count=len(plans_list), plans_lists=plans_list)
 
 
 @app.route('/updatePlan.html/<int:id>/', methods=['GET', 'POST'])
@@ -901,18 +901,18 @@ def update_plan(id):
         return render_template('updatePlan.html', form=update_plan_form)
 
 
-@app.route('/deletePlan/<int:id>', methods=['POST'])
-def delete_plan(id):
-    plans_dict = {}
-    db = shelve.open('Plans.db', 'w')
-    plans_dict = db['Plans']
-
-    plans_dict.pop(id)
-
-    db['Plans'] = plans_dict
-    db.close()
-
-    return redirect(url_for('retrieve_plan'))
+# @app.route('/deletePlan/<int:id>', methods=['POST'])
+# def delete_plan(id):
+#     plans_dict = {}
+#     db = shelve.open('Plans.db', 'w')
+#     plans_dict = db['Plans']
+#
+#     plans_dict.pop(id)
+#
+#     db['Plans'] = plans_dict
+#     db.close()
+#
+#     return redirect(url_for('retrieve_plan'))
 
 
 # @app.route('/searchLoan.html', methods=['GET','POST'])

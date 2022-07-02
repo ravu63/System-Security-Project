@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2258dae0-46fc-4f4d-9ce2-e141f0038388" name="Changes" comment="adding of Loan and Plan">
+    <list default="true" id="2258dae0-46fc-4f4d-9ce2-e141f0038388" name="Changes" comment="fixing loan and plan pt 1">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
     </list>
     <list id="8bfc9188-6646-434e-bbb3-fc9971ffec79" name="Changes by joshu" comment="" />
@@ -199,7 +200,14 @@
       <option name="project" value="LOCAL" />
       <updated>1656770356122</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="fixing loan and plan pt 1">
+      <created>1656771473316</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1656771473316</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -222,6 +230,7 @@
     <MESSAGE value="Cleaning" />
     <MESSAGE value="Scrapped of Ashton" />
     <MESSAGE value="adding of Loan and Plan" />
-    <option name="LAST_COMMIT_MESSAGE" value="adding of Loan and Plan" />
+    <MESSAGE value="fixing loan and plan pt 1" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixing loan and plan pt 1" />
   </component>
 </project>
