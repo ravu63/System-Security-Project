@@ -339,7 +339,6 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
         if new_user.TWOFAStatus == "None":
-            session['email'] = new_user.email
             return render_template('setup2FA.html')
     return render_template('signup.html', form=form)
 
@@ -363,15 +362,31 @@ camera = cv2.VideoCapture(0)
 
 
 def gen_frames():  # generate frame by frame from camera
+
     global out, capture, rec_frame
     while True:
         success, frame = camera.read()
         if success:
             if (capture):
                 capture = 0
-                now = datetime.now()
-                p = os.path.sep.join(['shots', "shot_{}.jpg".format(str(now).replace(":", ''))])
+                user_mock = User.query.all()
+                user_email = user_mock[-1].email
+                p = os.path.sep.join(['shots', "shot_{}.jpg".format(user_email)])
                 cv2.imwrite(p, frame)
+                blob_client = blob_service_client.get_blob_client(container='radiant', blob=p)
+                container_client = blob_service_client.get_container_client("radiant")
+                with open(p, "rb") as data:
+                    blob_client.upload_blob(data)
+                url = "https://ravu63.blob.core.windows.net/radiant/" + p
+                image_url = url
+                image_url_name = os.path.basename(url)
+                see_face = face_client.face.detect_with_url(url=image_url, detection_model='detection_03')
+                if not see_face:
+                    print("Face is not detected")
+
+                else:
+                    print("Face is detected")
+
 
             try:
                 ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
