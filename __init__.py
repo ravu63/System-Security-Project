@@ -1,14 +1,15 @@
 from currency_converter import CurrencyConverter
 import Loan
 import random
+import datetime
 import string
 import shelve
 import Plan
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
-from Forms import  OTPform, \
-     CreateLoanForm, CreatePlanForm, PawnCreation, \
+from Forms import OTPform, \
+    CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from flask_wtf import FlaskForm
@@ -29,13 +30,15 @@ import cv2
 from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+import os
 
 KEY = "8341c4d3ee5842ea9ab5a2f9192a020a"
 ENDPOINT = "https://radiant63.cognitiveservices.azure.com/"
 face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
-blob_service_client = BlobServiceClient.from_connection_string("DefaultEndpointsProtocol=https;AccountName=ravu63;AccountKey=Rb3XX8PGQswVKFQPNYGjh+d/1+s98EOyNvltfbuoL89v0c7HcTGa7bPykBuaD8A0FkEVWuNokhhn+AStJVn5+w==;EndpointSuffix=core.windows.net")
+blob_service_client = BlobServiceClient.from_connection_string(
+    "DefaultEndpointsProtocol=https;AccountName=ravu63;AccountKey=Rb3XX8PGQswVKFQPNYGjh+d/1+s98EOyNvltfbuoL89v0c7HcTGa7bPykBuaD8A0FkEVWuNokhhn+AStJVn5+w==;EndpointSuffix=core.windows.net")
 
-s=URLSafeTimedSerializer('ThisIsASecret!')
+s = URLSafeTimedSerializer('ThisIsASecret!')
 app = Flask(__name__)
 app.debug = True
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -65,7 +68,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.Integer, nullable=False)
     passwordChange = db.Column(db.Date, nullable=False)
-    passAttempt=(db.Column(db.Integer, nullable=False))
+    passAttempt = (db.Column(db.Integer, nullable=False))
     TWOFAStatus = db.Column(db.String(30), nullable=False)
 
 
@@ -86,6 +89,7 @@ class Pawn(db.Model):
     sui = db.Column(db.String(10), nullable=False)
     pawn_status = db.Column(db.String(10), nullable=False)
 
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
@@ -102,7 +106,8 @@ class Transaction(db.Model):
 # Joshua
 class CreateCustomerForm(FlaskForm):
     name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()])
-    gender = SelectField('Gender', [validators.DataRequired()],choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='')
+    gender = SelectField('Gender', [validators.DataRequired()],
+                         choices=[('', 'Select'), ('F', 'Female'), ('M', 'Male')], default='')
     phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
@@ -130,7 +135,7 @@ class LoginForm(FlaskForm):
 
 class UpdateCustomerForm(FlaskForm):
     name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()])
-    gender = SelectField('Gender', [validators.DataRequired()],choices=[('F', 'Female'), ('M', 'Male')], default='')
+    gender = SelectField('Gender', [validators.DataRequired()], choices=[('F', 'Female'), ('M', 'Male')], default='')
     phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
@@ -140,9 +145,11 @@ class UpdateCustomerForm(FlaskForm):
         if not phone.data[1:8].isdigit():
             raise ValidationError("Phone number must not contain letters")
 
+
 class ForgetPassword(FlaskForm):
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     submit = SubmitField('Submit')
+
 
 class UpdateCustomerForm2(FlaskForm):
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
@@ -150,11 +157,10 @@ class UpdateCustomerForm2(FlaskForm):
     confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
     submit = SubmitField('Submit')
 
+
 class UpdateCustomerForm3(FlaskForm):
     email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     submit = SubmitField('Submit')
-
-
 
 
 # End of Joshua
@@ -227,7 +233,6 @@ class filterStatus(FlaskForm):
 # End of  Forms
 
 
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -251,7 +256,7 @@ def home():
 @login_required
 def main():
     role = session['role']
-    if role == 1 or role ==0:
+    if role == 1 or role == 0:
         pass
     else:
         return redirect(url_for('home'))
@@ -274,11 +279,12 @@ def dashboard():
 def page_not_found(e):
     return render_template('error404.html'), 404
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        current=date.today()
+        current = date.today()
         user = User.query.filter_by(email=form.email.data).first()
 
         if user.passAttempt > 3:
@@ -291,20 +297,21 @@ def login():
                 if diff.days < 30:
                     if bcrypt.check_password_hash(user.password, form.password.data):
                         login_user(user)
-                        if diff.days>=25:
-                            msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',recipients=[user.email])
-                            msg.body = 'Your password is expiring in {} days'.format(30-diff.days)
+                        if diff.days >= 25:
+                            msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',
+                                          recipients=[user.email])
+                            msg.body = 'Your password is expiring in {} days'.format(30 - diff.days)
                             mail.send(msg)
                         if user.role == 0:
-                            session['id']=user.id
-                            session['role']=user.role
+                            session['id'] = user.id
+                            session['role'] = user.role
                             return redirect(url_for('main'))
                         else:
                             session['id'] = user.id
-                            session['role']=user.role
+                            session['role'] = user.role
                             return redirect(url_for('dashboard'))
                     else:
-                        user.passAttempt+=1
+                        user.passAttempt += 1
                         db.session.commit()
                         flash(u'Invalid Email or Password')
                 else:
@@ -322,32 +329,78 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today, passAttempt=0,TWOFAStatus='None')
+                        passwordChange=today, passAttempt=0, TWOFAStatus='None')
         db.session.add(new_user)
         db.session.commit()
         if new_user.TWOFAStatus == "None":
+            session['email'] = new_user.email
             return render_template('setup2FA.html')
     return render_template('signup.html', form=form)
+
+
 # Ravu Face Verification Shit
+global capture, rec_frame, grey, switch, neg, face, rec, out
+capture = 0
+grey = 0
+neg = 0
+face = 0
+switch = 1
+rec = 0
+
+# make shots directory to save pics
+try:
+    os.mkdir('./shots')
+except OSError as error:
+    pass
+
 camera = cv2.VideoCapture(0)
-def gen_frames():  
+
+
+def gen_frames():  # generate frame by frame from camera
+    global out, capture, rec_frame
     while True:
-        success, frame = camera.read()  # read the camera frame
-        if not success:
-            break
+        success, frame = camera.read()
+        if success:
+            if (capture):
+                capture = 0
+                now = datetime.now()
+                p = os.path.sep.join(['shots', "shot_{}.jpg".format(str(now).replace(":", ''))])
+                cv2.imwrite(p, frame)
+
+            try:
+                ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            except Exception as e:
+                pass
+
         else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+            pass
+
+
+@app.route('/registerFace')
+def registerFace():
+    return render_template('registerFace.html')
+
+
 @app.route('/video_feed')
 def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-@app.route('/registerFace', methods=['GET', 'POST'])
-def registerFace():
+@app.route('/requests', methods=['POST', 'GET'])
+def tasks():
+    global switch, camera
+    if request.method == 'POST':
+        if request.form.get('click') == 'Capture':
+            global capture
+            capture = 1
+
+    elif request.method == 'GET':
+        return render_template('registerFace.html')
     return render_template('registerFace.html')
+
 
 # End of Ravu Face shit
 
@@ -365,7 +418,8 @@ def create_admin():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
-                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1, passwordChange=today, passAttempt=0,TWOFAStatus='idk')
+                        birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1,
+                        passwordChange=today, passAttempt=0, TWOFAStatus='idk')
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('manage_admin'))
@@ -435,7 +489,7 @@ def delete_customer(id):
 @login_required
 def delete_admin(id):
     role = session['role']
-    if role ==1:
+    if role == 1:
         pass
     else:
         return redirect(url_for('main'))
@@ -516,7 +570,7 @@ def change_password():
         today = date.today()
         user.password = hashed_password
         user.passwordChange = today
-        user.passAttempt=0
+        user.passAttempt = 0
         db.session.commit()
         session.pop('email', None)
         session.pop('otp', None)
@@ -546,7 +600,7 @@ def manage_account():
 
         return redirect(url_for('main'))
 
-    return render_template('manageAccount.html', form=form,user=user)
+    return render_template('manageAccount.html', form=form, user=user)
 
 
 @app.route('/changeEmail', methods=['GET', 'POST'])
@@ -557,15 +611,16 @@ def email():
         pass
     else:
         return redirect(url_for('home'))
-    id=session['id']
-    user=User.query.get(id)
-    email=user.email
-    token =s.dumps(email)
+    id = session['id']
+    user = User.query.get(id)
+    email = user.email
+    token = s.dumps(email)
     msg = Message('Changing Email', sender='radiantfinancenyp@gmail.com', recipients=[email])
-    link=url_for('customer_email',token=token, _external=True)
+    link = url_for('customer_email', token=token, _external=True)
     msg.body = 'here is the link to change your email {}'.format(link)
     mail.send(msg)
     return redirect(url_for('confirm'))
+
 
 @app.route('/changeEmailConfirm')
 @login_required
@@ -577,26 +632,28 @@ def confirm():
         return redirect(url_for('home'))
     return render_template('changeEmailLink.html')
 
+
 @app.route('/customerChangeEmail/<token>', methods=['GET', 'POST'])
 @login_required
 def customer_email(token):
     role = session['role']
-    if role==1 or role ==0:
+    if role == 1 or role == 0:
         pass
     else:
         return redirect(url_for('home'))
     try:
-        email=s.loads(token, max_age=20)
+        email = s.loads(token, max_age=20)
     except SignatureExpired:
         return redirect(url_for('expired'))
-    id=session['id']
+    id = session['id']
     form = UpdateCustomerForm3()
     user = User.query.get(id)
     if request.method == 'POST' and form.validate_on_submit():
-        user.email =request.form['email']
+        user.email = request.form['email']
         db.session.commit()
         return redirect(url_for('main'))
     return render_template('changeEmail.html', form=form)
+
 
 @app.route('/expired')
 @login_required
@@ -607,6 +664,7 @@ def expired():
     else:
         return redirect(url_for('home'))
     return render_template('expired.html')
+
 
 @app.route('/customerChangePass', methods=['GET', 'POST'])
 @login_required
@@ -624,14 +682,10 @@ def customer_change():
         today = date.today()
         user.password = hashed_password
         user.passwordChange = today
-        user.passAttempt=0
+        user.passAttempt = 0
         db.session.commit()
         return redirect(url_for('main'))
     return render_template('customerChangePass.html', form=form)
-
-
-
-
 
 
 @app.route('/noCustomer')
@@ -654,8 +708,6 @@ def no_record():
     else:
         return redirect(url_for('home'))
     return render_template('noRecord.html')
-
-
 
 
 # Joshua
