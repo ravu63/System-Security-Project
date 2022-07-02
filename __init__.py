@@ -322,7 +322,7 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today, passAttempt=0,TWOFAStatus='idk')
+                        passwordChange=today, passAttempt=0,TWOFAStatus='None')
         db.session.add(new_user)
         db.session.commit()
         if new_user.TWOFAStatus == "None":
