@@ -97,6 +97,19 @@ class Transaction(db.Model):
     address = db.Column(db.String(100), nullable=False)
     city = db.Column(db.String(100), nullable=False)
 
+class LoanData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(20), nullable=False)
+    last_name = db.Column(db.String(20), nullable=False)
+    amount = db.Column(db.Integer, nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+
+
+class PlanData(db.Model):
+    id = db.Column(db.Integer, Primary_key=True)
+    Plan_name = db.Columb(db.String(30), nullable=False)
+    Plan_description = db.Column(db.String(300), nullable=False)
+    Plan_interest = db.Column(db.Integer, nullable=False)
 
 # end Create table
 
