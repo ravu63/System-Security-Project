@@ -1,10 +1,7 @@
 from currency_converter import CurrencyConverter
-import Loan
 import random
 import datetime
 import string
-import shelve
-import Plan
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
@@ -89,14 +86,16 @@ class Pawn(db.Model):
     sui = db.Column(db.String(10), nullable=False)
     pawn_status = db.Column(db.String(10), nullable=False)
 
+
 class Transaction(db.Model):
-    id = db.Column(db.Interger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(30), nullable=False)
     address = db.Column(db.String(100), nullable=False)
     city = db.Column(db.String(40), nullable=False)
     state = db.Column(db.String(50), nullable=False)
-    postalcode = db.Column(db.Interger, nullable=False)
+    postalcode = db.Column(db.Integer, nullable=False)
+
 
 class LoanData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -108,9 +107,10 @@ class LoanData(db.Model):
 
 class PlanData(db.Model):
     id = db.Column(db.Integer, Primary_key=True)
-    Plan_name = db.Columb(db.String(30), nullable=False)
+    Plan_name = db.Column(db.String(30), nullable=False)
     Plan_description = db.Column(db.String(300), nullable=False)
     Plan_interest = db.Column(db.Integer, nullable=False)
+
 
 # end Create table
 
@@ -252,14 +252,13 @@ class TransactionForm(FlaskForm):
     state = StringField('State', [validators.Length(min=3, max=150), validators.DataRequired])
     postalcode = StringField('Postal Code', [validators.Length(min=4, max=6), validators.DataRequired])
 
-    #def validate_name(self, name):
+    # def validate_name(self, name):
 
     def validate_postalcode(self, postalcode):
         if not postalcode.data[1:6].isdigit():
             raise ValidationError("Postal Code must not contain letters")
 
-    #def validate_email(self,email):
-
+    # def validate_email(self,email):
 
 
 # End of Chest
@@ -339,10 +338,10 @@ def login():
                         if user.role == 0:
                             session['id'] = user.id
                             session['role'] = user.role
-                            user.passAttempt=0
+                            user.passAttempt = 0
                             db.session.commit()
                             return redirect(url_for('main'))
-                        elif user.role==1:
+                        elif user.role == 1:
                             session['id'] = user.id
                             session['role'] = user.role
                             user.passAttempt = 0
@@ -420,7 +419,6 @@ def gen_frames():  # generate frame by frame from camera
 
                 else:
                     print("Face is detected")
-
 
             try:
                 ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
