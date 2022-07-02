@@ -89,13 +89,14 @@ class Pawn(db.Model):
     sui = db.Column(db.String(10), nullable=False)
     pawn_status = db.Column(db.String(10), nullable=False)
 
-
 class Transaction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Interger, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(30), nullable=False)
     address = db.Column(db.String(100), nullable=False)
-    city = db.Column(db.String(100), nullable=False)
+    city = db.Column(db.String(40), nullable=False)
+    state = db.Column(db.String(50), nullable=False)
+    postalcode = db.Column(db.Interger, nullable=False)
 
 
 # end Create table
@@ -229,6 +230,26 @@ class filterStatus(FlaskForm):
 
 # End of Ravu
 
+# Start of Chest forms
+class TransactionForm(FlaskForm):
+    name = StringField('Name', [validators.Length(min=3, max=150), validators.DataRequired()])
+    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
+    address = TextAreaField('Mailing Address', [validators.length(max=200), validators.DataRequired()])
+    city = StringField('City', [validators.Length(min=3, max=150), validators.DataRequired])
+    state = StringField('State', [validators.Length(min=3, max=150), validators.DataRequired])
+    postalcode = StringField('Postal Code', [validators.Length(min=4, max=6), validators.DataRequired])
+
+    #def validate_name(self, name):
+
+    def validate_postalcode(self, postalcode):
+        if not postalcode.data[1:6].isdigit():
+            raise ValidationError("Postal Code must not contain letters")
+
+    #def validate_email(self,email):
+
+
+
+# End of Chest
 
 # End of  Forms
 
