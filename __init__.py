@@ -780,19 +780,11 @@ def loans():
     return render_template('Loan.html', count=len(plans_list), plans_lists=plans_list)
 
 
-# class LoanData(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     first_name = db.Column(db.String(20), nullable=False)
-#     last_name = db.Column(db.String(20), nullable=False)
-#     amount = db.Column(db.Integer, nullable=False)
-#     email = db.Column(db.String(100), nullable=False)
-
-
 @app.route('/createLoan.html', methods=['GET', 'POST'])
 def create_loan():
     create_loan_form = CreateLoanForm(request.form)
     if request.method == 'POST' and create_loan_form.validate():
-        loanentry = PlanData(first_name=create_loan_form.first_name.data,
+        loanentry = LoanData(first_name=create_loan_form.first_name.data,
                              last_name=create_loan_form.last_name.data,
                              amount=create_loan_form.Amount.data,
                              email=create_loan_form.email.data)
@@ -821,19 +813,12 @@ def retrieve_loans():
 def update_loan(id):
     update_loan_form = CreateLoanForm(request.form)
     if request.method == 'POST' and update_loan_form.validate():
-        loans_dict = {}
-        db = shelve.open('Loan.db', 'w')
-        loans_dict = db['Loans']
-
-        loan = loans_dict.get(id)
-        loan.set_loan_name1(update_loan_form.first_name.data)
-        loan.set_loan_name2(update_loan_form.last_name.data)
-        loan.set_loan_amount(update_loan_form.Amount.data)
-        loan.set_loan_email(update_loan_form.email.data)
-
-        db['Loans'] = loans_dict
-        db.close()
-
+        loanentry = LoanData(first_name=update_loan_form.first_name.data,
+                             last_name=update_loan_form.last_name.data,
+                             amount=update_loan_form.Amount.data,
+                             email=update_loan_form.email.data)
+        db.session.add(loanentry)
+        db.session.commit()
         return redirect(url_for('retrieve_loans'))
     else:
         loans_dict = {}
@@ -876,6 +861,7 @@ def create_plan():
 
     return render_template('createPlan.html', form=create_plan_form)
 
+
 @app.route('/retrievePlan.html')
 def retrieve_plan():
     plans_dict = {}
@@ -895,18 +881,11 @@ def retrieve_plan():
 def update_plan(id):
     update_plan_form = CreatePlanForm(request.form)
     if request.method == 'POST' and update_plan_form.validate():
-        plans_dict = {}
-        db = shelve.open('Plans.db', 'w')
-        plans_dict = db['Plans']
-
-        plan = plans_dict.get(id)
-        plan.set_loan_plan_name(update_plan_form.Plan_name.data)
-        plan.set_loan_plan_desc(update_plan_form.Plan_Des.data)
-        plan.set_loan_plan_int(update_plan_form.Plan_interest.data)
-
-        db['Plans'] = plans_dict
-        db.close()
-
+        planentry = PlanData(Plan_Name=update_plan_form.Plan_name.data,
+                             Plan_descripion=update_plan_form.Plan_Des.data,
+                             Plan_interest=update_plan_form.Plan_interest.data)
+        db.session.add(planentry)
+        db.session.commit()
         return redirect(url_for('retrieve_plan'))
     else:
         plans_dict = {}
