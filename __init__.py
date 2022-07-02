@@ -287,7 +287,7 @@ def login():
         current = date.today()
         user = User.query.filter_by(email=form.email.data).first()
 
-        if user.passAttempt > 3:
+        if user.passAttempt > 2:
             flash(u'Too many failed password attepmts. Please reset password.')
         else:
             if user:
