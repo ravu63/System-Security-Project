@@ -325,9 +325,31 @@ def signup():
                         passwordChange=today, passAttempt=0,TWOFAStatus='idk')
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('login'))
-
+        if new_user.TWOFAStatus == "None":
+            return render_template('setup2FA.html')
     return render_template('signup.html', form=form)
+# Ravu Face Verification Shit
+camera = cv2.VideoCapture(0)
+def gen_frames():  
+    while True:
+        success, frame = camera.read()  # read the camera frame
+        if not success:
+            break
+        else:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/registerFace', methods=['GET', 'POST'])
+def registerFace():
+    return render_template('registerFace.html')
+
+# End of Ravu Face shit
 
 
 @app.route('/createAdmin', methods=['GET', 'POST'])
