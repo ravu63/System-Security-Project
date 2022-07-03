@@ -105,7 +105,7 @@ class LoanData(db.Model):
 
 
 class PlanData(db.Model):
-    id = db.Column(db.Integer, Primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     Plan_name = db.Column(db.String(30), nullable=False)
     Plan_description = db.Column(db.String(300), nullable=False)
     Plan_interest = db.Column(db.Integer, nullable=False)
@@ -792,21 +792,15 @@ def create_loan():
         db.session.commit()
         return redirect(url_for('retrieve_loan'))
     return render_template('createLoan.html', form=create_loan_form)
+#
+# @login_manager.user_loader
+# def load_user(user_id):
+#     return User.query.get(int(user_id))
 
 
-# @app.route('/retrieveLoan.html')
-# def retrieve_loans():
-#     loans_dict = {}
-#     db = shelve.open('Loan.db', 'r')
-#     loans_dict = db['Loans']
-#     db.close()
-#
-#     loans_list = []
-#     for key in loans_dict:
-#         loan = loans_dict.get(key)
-#         loans_list.append(loan)
-#
-#     return render_template('retrieveLoan.html', count=len(loans_list), loans_lists=loans_list)
+@app.route('/retrieveLoan.html')
+def retrieve_loans():
+    return LoanData.query.get(int(LoanData.id))
 
 
 @app.route('/updateLoan.html/<int:id>/', methods=['GET', 'POST'])
@@ -821,16 +815,10 @@ def update_loan(id):
         db.session.commit()
         return redirect(url_for('retrieve_loans'))
     else:
-        loans_dict = {}
-        db = shelve.open('Loan.db', 'r')
-        loans_dict = db['Loans']
-        db.close()
-
-        loan = loans_dict.get(id)
-        update_loan_form.first_name.data = loan.get_loan_first()
-        update_loan_form.last_name.data = loan.get_loan_last()
-        update_loan_form.Amount.data = loan.get_loan_amount()
-
+        # loan = LoanData.query.get(int(LoanData.id))
+        # update_loan_form.first_name.data = loan.get_loan_first()
+        # update_loan_form.last_name.data = loan.get_loan_last()
+        # update_loan_form.Amount.data = loan.get_loan_amount()
         return render_template('updateLoan.html', form=update_loan_form)
 
 
@@ -852,7 +840,8 @@ def update_loan(id):
 def create_plan():
     create_plan_form = CreatePlanForm(request.form)
     if request.method == 'POST' and create_plan_form.validate():
-        planentry = PlanData(Plan_Name=create_plan_form.Plan_name.data,
+        planentry = PlanData(id=PlanData.id + 1,
+                             Plan_Name=create_plan_form.Plan_name.data,
                              Plan_descripion=create_plan_form.Plan_Des.data,
                              Plan_interest=create_plan_form.Plan_interest.data)
         db.session.add(planentry)
