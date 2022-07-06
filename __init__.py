@@ -27,6 +27,9 @@ from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import os
+import datetime
+
+
 
 KEY = "8341c4d3ee5842ea9ab5a2f9192a020a"
 ENDPOINT = "https://radiant63.cognitiveservices.azure.com/"
@@ -375,7 +378,7 @@ def signup():
     return render_template('signup.html', form=form)
 
 
-# Ravu Face Verification Shit
+# Ravu Face Verification
 global capture, rec_frame, grey, switch, neg, face, rec, out
 capture = 0
 grey = 0
@@ -394,19 +397,16 @@ camera = cv2.VideoCapture(0)
 
 
 def gen_frames():  # generate frame by frame from camera
-
     global out, capture, rec_frame
     while True:
         success, frame = camera.read()
         if success:
             if (capture):
                 capture = 0
-                user_mock = User.query.all()
-                user_email = user_mock[-1].email
-                p = os.path.sep.join(['shots', "shot_{}.jpg".format(user_email)])
+                now = datetime.datetime.now()
+                p = os.path.sep.join(['shots', "shot_{}.jpg".format(str(now).replace(":", ''))])
                 cv2.imwrite(p, frame)
                 blob_client = blob_service_client.get_blob_client(container='radiant', blob=p)
-                container_client = blob_service_client.get_container_client("radiant")
                 with open(p, "rb") as data:
                     blob_client.upload_blob(data)
                 url = "https://ravu63.blob.core.windows.net/radiant/" + p
@@ -414,8 +414,7 @@ def gen_frames():  # generate frame by frame from camera
                 image_url_name = os.path.basename(url)
                 see_face = face_client.face.detect_with_url(url=image_url, detection_model='detection_03')
                 if not see_face:
-                    print("Face is not detected")
-
+                    raise Exception('No face detected from image {}'.format(image_url_name))
                 else:
                     print("Face is detected")
 
