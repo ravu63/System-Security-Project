@@ -69,6 +69,7 @@ class User(db.Model, UserMixin):
     passwordChange = db.Column(db.Date, nullable=False)
     passAttempt = (db.Column(db.Integer, nullable=False))
     TWOFAStatus = db.Column(db.String(30), nullable=False)
+    FUI = db.Column(db.String(300), nullable=True)
 
 
 class Pawn(db.Model):
@@ -370,7 +371,7 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today, passAttempt=0, TWOFAStatus='None')
+                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None")
         db.session.add(new_user)
         db.session.commit()
         if new_user.TWOFAStatus == "None":
@@ -417,6 +418,7 @@ def gen_frames():  # generate frame by frame from camera
                     raise Exception('No face detected from image {}'.format(image_url_name))
                 else:
                     print("Face is detected")
+
 
             try:
                 ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
