@@ -420,6 +420,7 @@ def gen_frames():  # generate frame by frame from camera
                     print("Face is detected")
 
 
+
             try:
                 ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
                 frame = buffer.tobytes()
