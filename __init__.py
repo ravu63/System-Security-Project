@@ -1,7 +1,7 @@
 import random
 import datetime
 import string
-from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, make_response
 from flask_mail import Mail, Message
 from Feedback1 import Feedback1
 from Forms import OTPform, \
@@ -70,6 +70,7 @@ class User(db.Model, UserMixin):
     passAttempt = (db.Column(db.Integer, nullable=False))
     TWOFAStatus = db.Column(db.String(30), nullable=False)
     FUI = db.Column(db.String(300), nullable=True)
+    random_int = db.Column(db.Integer)
 
 
 class Pawn(db.Model):
@@ -88,6 +89,7 @@ class Pawn(db.Model):
     period = db.Column(db.String(10), nullable=False)
     sui = db.Column(db.String(10), nullable=False)
     pawn_status = db.Column(db.String(10), nullable=False)
+
 
 
 class Transaction(db.Model):
@@ -322,17 +324,24 @@ def login():
     if form.validate_on_submit():
         current = date.today()
         user = User.query.filter_by(email=form.email.data).first()
-
-        if user.passAttempt > 2:
-            flash(u'Too many failed password attepmts. Please reset password.')
-        else:
-            if user:
+        if user:
+            if user.passAttempt > 2:
+                flash(u'Too many failed password attepmts. Please reset password.')
+            else:
                 before = user.passwordChange
                 diff = current - before
 
                 if diff.days < 30:
                     if bcrypt.check_password_hash(user.password, form.password.data):
                         login_user(user)
+                        #num=request.cookies.get('num')
+                        #if num==user.random_int:
+                        #    pass
+                        #else:
+                        #    msg=Message('Login to new Device',sender='radiantfinancenyp@gmail.com',
+                        #                recipients=[user.email])
+                        #    msg.body='There is a new device login. If this is not you, please change your password immediately'
+                        #    mail.send(msg)
                         if diff.days >= 25:
                             msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',
                                           recipients=[user.email])
@@ -358,8 +367,8 @@ def login():
                         flash(u'Invalid Email or Password')
                 else:
                     flash(u'Password has expired. Please change password.')
-            else:
-                flash(u'Invalid Email or Password')
+        else:
+            flash(u'Invalid Email or Password')
     return render_template('login.html', form=form)
 
 
@@ -369,13 +378,17 @@ def signup():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         today = date.today()
+        num=random.randint(1111,999999)
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None")
+                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None",random_int=num)
         db.session.add(new_user)
         db.session.commit()
         if new_user.TWOFAStatus == "None":
+            resp=make_response(render_template('setup2FA.html'))
+            #resp.set_cookie('num',num)
             return render_template('setup2FA.html')
+
     return render_template('signup.html', form=form)
 
 
