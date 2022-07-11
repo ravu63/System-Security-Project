@@ -334,7 +334,7 @@ def login():
                 if diff.days < 30:
                     if bcrypt.check_password_hash(user.password, form.password.data):
                         login_user(user)
-                        num=int(request.cookies.get('num'))
+                        num=request.cookies.get('num')
                         if num==user.random_int:
                             pass
                         else:
