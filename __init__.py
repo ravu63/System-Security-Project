@@ -334,14 +334,14 @@ def login():
                 if diff.days < 30:
                     if bcrypt.check_password_hash(user.password, form.password.data):
                         login_user(user)
-                        #num=request.cookies.get('num')
-                        #if num==user.random_int:
-                        #    pass
-                        #else:
-                        #    msg=Message('Login to new Device',sender='radiantfinancenyp@gmail.com',
-                        #                recipients=[user.email])
-                        #    msg.body='There is a new device login. If this is not you, please change your password immediately'
-                        #    mail.send(msg)
+                        num=int(request.cookies.get('num'))
+                        if num==user.random_int:
+                            pass
+                        else:
+                            msg=Message('Login to new Device',sender='radiantfinancenyp@gmail.com',
+                                        recipients=[user.email])
+                            msg.body='There is a new device login. If this is not you, please change your password immediately'
+                            mail.send(msg)
                         if diff.days >= 25:
                             msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',
                                           recipients=[user.email])
@@ -386,8 +386,10 @@ def signup():
         db.session.commit()
         if new_user.TWOFAStatus == "None":
             resp=make_response(render_template('setup2FA.html'))
-            #resp.set_cookie('num',num)
-            return render_template('setup2FA.html')
+            num1=str(num)
+            resp.set_cookie('num',num1,expires=datetime.datetime.now()+datetime.timedelta(days=30))
+            return resp
+            #return render_template('setup2FA.html')
 
     return render_template('signup.html', form=form)
 
