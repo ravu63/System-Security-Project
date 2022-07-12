@@ -335,13 +335,6 @@ def login():
                     if bcrypt.check_password_hash(user.password, form.password.data):
                         login_user(user)
                         num=request.cookies.get('num')
-                        if num==user.random_int:
-                            pass
-                        else:
-                            msg=Message('Login to new Device',sender='radiantfinancenyp@gmail.com',
-                                        recipients=[user.email])
-                            msg.body='There is a new device login. If this is not you, please change your password immediately'
-                            mail.send(msg)
                         if diff.days >= 25:
                             msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',
                                           recipients=[user.email])
@@ -352,7 +345,17 @@ def login():
                             session['role'] = user.role
                             user.passAttempt = 0
                             db.session.commit()
-                            return redirect(url_for('main'))
+                            if num == user.random_int:
+                                pass
+                            else:
+                                msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
+                                              recipients=[user.email])
+                                msg.body = 'There is a new device login. If this is not you, please change your password immediately'
+                                mail.send(msg)
+                                resp =make_response(redirect(url_for('main')))
+                                num1 = str(user.random_int)
+                                resp.set_cookie('num', num1,expires=datetime.datetime.now() + datetime.timedelta(days=30))
+                                return resp
                         elif user.role == 1:
                             session['id'] = user.id
                             session['role'] = user.role
@@ -385,7 +388,7 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
         if new_user.TWOFAStatus == "None":
-            resp=make_response(render_template('setup2FA.html'))
+            resp=make_response(redirect(url_for('login')))
             num1=str(num)
             resp.set_cookie('num',num1,expires=datetime.datetime.now()+datetime.timedelta(days=30))
             return resp
