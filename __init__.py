@@ -28,6 +28,8 @@ from msrest.authentication import CognitiveServicesCredentials
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import os
 import datetime
+from getmac import get_mac_address as gma
+import socket
 
 
 
@@ -71,6 +73,12 @@ class User(db.Model, UserMixin):
     TWOFAStatus = db.Column(db.String(30), nullable=False)
     FUI = db.Column(db.String(300), nullable=True)
     random_int = db.Column(db.Integer)
+
+class checkNew(db.Model):
+    id=db.Column(db.Integer,primary_key=True)
+    email=db.Column(db.String(30),nullable=False)
+    device_name=db.Column(db.String(30),nullable=False)
+    macaddr=db.Column(db.String(17),nullable=False)
 
 
 class Pawn(db.Model):
@@ -324,6 +332,7 @@ def login():
     if form.validate_on_submit():
         current = date.today()
         user = User.query.filter_by(email=form.email.data).first()
+        newdev=checkNew.query.filter_by(email=form.email.data).first()
         if user:
             if user.passAttempt > 2:
                 flash(u'Too many failed password attepmts. Please reset password.')
@@ -334,7 +343,6 @@ def login():
                 if diff.days < 30:
                     if bcrypt.check_password_hash(user.password, form.password.data):
                         login_user(user)
-                        num=request.cookies.get('num')
                         if diff.days >= 25:
                             msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',
                                           recipients=[user.email])
@@ -345,17 +353,18 @@ def login():
                             session['role'] = user.role
                             user.passAttempt = 0
                             db.session.commit()
-                            if num == user.random_int:
-                                pass
+                            hostname = socket.gethostname()
+                            if gma() == newdev.macaddr and hostname==newdev.device_name:
+                                return redirect(url_for('home'))
                             else:
                                 msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
                                               recipients=[user.email])
                                 msg.body = 'There is a new device login. If this is not you, please change your password immediately'
                                 mail.send(msg)
-                                resp =make_response(redirect(url_for('main')))
-                                num1 = str(user.random_int)
-                                resp.set_cookie('num', num1,expires=datetime.datetime.now() + datetime.timedelta(days=30))
-                                return resp
+                                new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
+                                db.session.add(new_dev)
+                                db.session.commit()
+                                return redirect(url_for('home'))
                         elif user.role == 1:
                             session['id'] = user.id
                             session['role'] = user.role
@@ -381,18 +390,18 @@ def signup():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         today = date.today()
-        num=random.randint(1111,999999)
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None",random_int=num)
+                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None")
         db.session.add(new_user)
         db.session.commit()
+
+        hostname = socket.gethostname()
+        new_dev=checkNew(email=form.email.data,device_name=hostname,macaddr=gma())
+        db.session.add(new_dev)
+        db.session.commit()
         if new_user.TWOFAStatus == "None":
-            resp=make_response(redirect(url_for('login')))
-            num1=str(num)
-            resp.set_cookie('num',num1,expires=datetime.datetime.now()+datetime.timedelta(days=30))
-            return resp
-            #return render_template('setup2FA.html')
+            return render_template('setup2FA.html')
 
     return render_template('signup.html', form=form)
 
