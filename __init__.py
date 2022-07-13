@@ -72,7 +72,7 @@ class User(db.Model, UserMixin):
     passAttempt = (db.Column(db.Integer, nullable=False))
     TWOFAStatus = db.Column(db.String(30), nullable=False)
     FUI = db.Column(db.String(300), nullable=True)
-    random_int = db.Column(db.Integer)
+
 
 class checkNew(db.Model):
     id=db.Column(db.Integer,primary_key=True)
@@ -355,7 +355,7 @@ def login():
                             db.session.commit()
                             hostname = socket.gethostname()
                             if gma() == newdev.macaddr and hostname==newdev.device_name:
-                                return redirect(url_for('home'))
+                                return redirect(url_for('main'))
                             else:
                                 msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
                                               recipients=[user.email])
@@ -364,7 +364,7 @@ def login():
                                 new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
                                 db.session.add(new_dev)
                                 db.session.commit()
-                                return redirect(url_for('home'))
+                                return redirect(url_for('main'))
                         elif user.role == 1:
                             session['id'] = user.id
                             session['role'] = user.role
