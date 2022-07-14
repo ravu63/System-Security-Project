@@ -325,6 +325,9 @@ def dashboard():
 def page_not_found(e):
     return render_template('error404.html'), 404
 
+newdev = checkNew.query.filter_by(email='joshualimse420@gmail.com').all()
+print( newdev)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -332,7 +335,7 @@ def login():
     if form.validate_on_submit():
         current = date.today()
         user = User.query.filter_by(email=form.email.data).first()
-        newdev=checkNew.query.filter_by(email=form.email.data).first()
+        newdev=checkNew.query.filter_by(email=form.email.data).all()
         if user:
             if user.passAttempt > 2:
                 flash(u'Too many failed password attepmts. Please reset password.')
@@ -354,11 +357,14 @@ def login():
                             user.passAttempt = 0
                             db.session.commit()
                             hostname = socket.gethostname()
-                            if gma() == newdev.macaddr and hostname==newdev.device_name:
-                                return redirect(url_for('main'))
-                            else:
+                            check=False
+                            for i in range(len(newdev)):
+                                if gma() == newdev[i].macaddr and hostname==newdev[i].device_name:
+                                    check=True
+                                    return redirect(url_for('main'))
+                            if check==False:
                                 msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
-                                              recipients=[user.email])
+                                                recipients=[user.email])
                                 msg.body = 'There is a new device login. If this is not you, please change your password immediately'
                                 mail.send(msg)
                                 new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
