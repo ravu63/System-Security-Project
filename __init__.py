@@ -325,8 +325,6 @@ def dashboard():
 def page_not_found(e):
     return render_template('error404.html'), 404
 
-newdev = checkNew.query.filter_by(email='joshualimse420@gmail.com').all()
-print( newdev)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -342,6 +340,7 @@ def login():
             else:
                 before = user.passwordChange
                 diff = current - before
+                hostname = socket.gethostname()
 
                 if diff.days < 30:
                     if bcrypt.check_password_hash(user.password, form.password.data):
@@ -356,7 +355,6 @@ def login():
                             session['role'] = user.role
                             user.passAttempt = 0
                             db.session.commit()
-                            hostname = socket.gethostname()
                             check=False
                             for i in range(len(newdev)):
                                 if gma() == newdev[i].macaddr and hostname==newdev[i].device_name:
@@ -376,6 +374,19 @@ def login():
                             session['role'] = user.role
                             user.passAttempt = 0
                             db.session.commit()
+                            check = False
+                            for i in range(len(newdev)):
+                                if gma() == newdev[i].macaddr and hostname == newdev[i].device_name:
+                                    check = True
+                                    return redirect(url_for('main'))
+                            if check == False:
+                                msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
+                                              recipients=[user.email])
+                                msg.body = 'There is a new device login. If this is not you, please change your password immediately'
+                                mail.send(msg)
+                                new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
+                                db.session.add(new_dev)
+                                db.session.commit()
                             return redirect(url_for('dashboard'))
                         else:
                             return redirect(url_for('home'))
