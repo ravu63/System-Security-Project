@@ -360,11 +360,10 @@ def login():
                                 for i in range(len(newdev)):
                                     if gma() == newdev[i].macaddr and hostname==newdev[i].device_name:
                                         check=True
-                                        return redirect(url_for('main'))
-                                        #if user.TWOFAStatus == "Face":
-                                       #     return redirect(url_for('verifyFace', id=user.id))
-                                        #else:
-                                            #return redirect(url_for('main'))
+                                        if user.TWOFAStatus == "Face":
+                                            return redirect(url_for('verifyFace', id=user.id))
+                                        else:
+                                            return redirect(url_for('main'))
                                 if check==False:
                                     msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
                                                     recipients=[user.email])
@@ -373,10 +372,10 @@ def login():
                                     new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
                                     db.session.add(new_dev)
                                     db.session.commit()
-                                    #if user.TWOFAStatus == "Face":
-                                     #   return redirect(url_for('verifyFace', id=user.id))
-                                    #else:
-                                    return redirect(url_for('main'))
+                                    if user.TWOFAStatus == "Face":
+                                        return redirect(url_for('verifyFace', id=user.id))
+                                    else:
+                                        return redirect(url_for('main'))
 
                             elif user.role == 1:
                                 session['id'] = user.id
