@@ -71,6 +71,7 @@ class User(db.Model, UserMixin):
     TWOFAStatus = db.Column(db.String(30), nullable=False)
     FUI = db.Column(db.String(300), nullable=True)
     FUI_ID = db.Column(db.String(300), nullable=True)
+    verified = db.Column(db.Integer, nullable=True)
 
 
 class checkNew(db.Model):
@@ -334,71 +335,77 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         newdev=checkNew.query.filter_by(email=form.email.data).all()
         if user:
-            if user.passAttempt > 2:
-                flash(u'Too many failed password attepmts. Please reset password.')
-            else:
-                before = user.passwordChange
-                diff = current - before
-                hostname = socket.gethostname()
+            if user.verified==1:
+                if user.passAttempt > 2:
+                    flash(u'Too many failed password attepmts. Please reset password.')
+                else:
+                    before = user.passwordChange
+                    diff = current - before
+                    hostname = socket.gethostname()
 
-                if diff.days < 30:
-                    if bcrypt.check_password_hash(user.password, form.password.data):
-                        login_user(user)
-                        if diff.days >= 25:
-                            msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',
-                                          recipients=[user.email])
-                            msg.body = 'Your password is expiring in {} days'.format(30 - diff.days)
-                            mail.send(msg)
-                        if user.role == 0:
-                            session['id'] = user.id
-                            session['role'] = user.role
-                            user.passAttempt = 0
-                            db.session.commit()
-                            check=False
-                            for i in range(len(newdev)):
-                                if gma() == newdev[i].macaddr and hostname==newdev[i].device_name:
-                                    check=True
+                    if diff.days < 30:
+                        if bcrypt.check_password_hash(user.password, form.password.data):
+                            login_user(user)
+                            if diff.days >= 25:
+                                msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',
+                                              recipients=[user.email])
+                                msg.body = 'Your password is expiring in {} days'.format(30 - diff.days)
+                                mail.send(msg)
+                            if user.role == 0:
+                                session['id'] = user.id
+                                session['role'] = user.role
+                                user.passAttempt = 0
+                                db.session.commit()
+                                check=False
+                                for i in range(len(newdev)):
+                                    if gma() == newdev[i].macaddr and hostname==newdev[i].device_name:
+                                        check=True
+                                        if user.TWOFAStatus == "Face":
+                                            return redirect(url_for('verifyFace', id=user.id))
+                                        else:
+                                            return redirect(url_for('main'))
+                                if check==False:
+                                    msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
+                                                    recipients=[user.email])
+                                    msg.body = 'There is a new device login. If this is not you, please change your password immediately'
+                                    mail.send(msg)
+                                    new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
+                                    db.session.add(new_dev)
+                                    db.session.commit()
                                     if user.TWOFAStatus == "Face":
                                         return redirect(url_for('verifyFace', id=user.id))
                                     else:
                                         return redirect(url_for('main'))
-                            if check==False:
-                                msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
-                                                recipients=[user.email])
-                                msg.body = 'There is a new device login. If this is not you, please change your password immediately'
-                                mail.send(msg)
-                                new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
-                                db.session.add(new_dev)
-                                db.session.commit()
-                                return redirect(url_for('main'))
 
-                        elif user.role == 1:
-                            session['id'] = user.id
-                            session['role'] = user.role
-                            user.passAttempt = 0
-                            db.session.commit()
-                            check = False
-                            for i in range(len(newdev)):
-                                if gma() == newdev[i].macaddr and hostname == newdev[i].device_name:
-                                    check = True
-                                    return redirect(url_for('dashboard'))
-                            if check == False:
-                                msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
-                                              recipients=[user.email])
-                                msg.body = 'There is a new device login. If this is not you, please change your password immediately'
-                                mail.send(msg)
-                                new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
-                                db.session.add(new_dev)
+                            elif user.role == 1:
+                                session['id'] = user.id
+                                session['role'] = user.role
+                                user.passAttempt = 0
                                 db.session.commit()
-                                return redirect(url_for('dashboard'))
+                                check = False
+                                for i in range(len(newdev)):
+                                    if gma() == newdev[i].macaddr and hostname == newdev[i].device_name:
+                                        check = True
+                                        return redirect(url_for('dashboard'))
+                                if check == False:
+                                    msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
+                                                  recipients=[user.email])
+                                    msg.body = 'There is a new device login. If this is not you, please change your password immediately'
+                                    mail.send(msg)
+                                    new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
+                                    db.session.add(new_dev)
+                                    db.session.commit()
+                                    return redirect(url_for('dashboard'))
+                            else:
+                                return redirect(url_for('home'))
                         else:
-                            return redirect(url_for('home'))
+                            user.passAttempt += 1
+                            db.session.commit()
+                            flash(u'Invalid Email or Password')
                     else:
-                        user.passAttempt += 1
-                        db.session.commit()
-                        flash(u'Invalid Email or Password')
-                else:
-                    flash(u'Password has expired. Please change password.')
+                        flash(u'Password has expired. Please change password.')
+            else:
+                flash(u'Please verify your email before continuing')
         else:
             flash(u'Invalid Email or Password')
     return render_template('login.html', form=form)
@@ -412,9 +419,16 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None",FUI_ID="None")
+                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None",FUI_ID="None",verified=0)
         db.session.add(new_user)
         db.session.commit()
+
+        msg = Message('Verify Email', sender='radiantfinancenyp@gmail.com',
+                      recipients=[form.email.data])
+        link = url_for('verify', _external=True)
+        msg.body = 'Please click the link to verify your email {}'.format(link)
+        mail.send(msg)
+        session['verify']=form.email.data
 
         hostname = socket.gethostname()
         new_dev=checkNew(email=form.email.data,device_name=hostname,macaddr=gma())
@@ -424,6 +438,15 @@ def signup():
             return render_template('setup2FA.html')
 
     return render_template('signup.html', form=form)
+
+@app.route('/verifyEmail', methods=['GET', 'POST'])
+def verify():
+    email=session['verify']
+    user=User.query.filter_by(email=email).first()
+    user.verified=1
+    db.session.commit()
+    return render_template('verified.html')
+
 
 
 # Ravu Face Verification
