@@ -274,7 +274,7 @@ input[type=button]:active, input[type=submit]:active, input[type=reset]:active  
     <br>
     <h3>Regiser for 2FA</h3>
     <!-- Tabs Titles -->
-    <a href="#" class="login">Email Verification</a>
+    <a href="{{ url_for('registerEmail2FA') }}" class="login">Email Verification</a>
     <a href="{{ url_for('registerFace') }}" class="login">Face Verification</a>
 
   </div>

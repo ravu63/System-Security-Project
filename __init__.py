@@ -362,6 +362,14 @@ def login():
                                         check=True
                                         if user.TWOFAStatus == "Face":
                                             return redirect(url_for('verifyFace', id=user.id))
+                                        elif user.TWOFAStatus == 'Email':
+                                            otp = random.randint(1111, 9999)
+                                            session['emailotp'] = otp
+                                            msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com',
+                                                          recipients=[user.email])
+                                            msg.body = 'here is your OTP:{}'.format(otp)
+                                            mail.send(msg)
+                                            return redirect(url_for('emailOTP'))
                                         else:
                                             return redirect(url_for('main'))
                                 if check==False:
@@ -374,6 +382,14 @@ def login():
                                     db.session.commit()
                                     if user.TWOFAStatus == "Face":
                                         return redirect(url_for('verifyFace', id=user.id))
+                                    elif user.TWOFAStatus=='Email':
+                                        otp = random.randint(1111, 9999)
+                                        session['emailotp'] = otp
+                                        msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com',
+                                                      recipients=[session['email']])
+                                        msg.body = 'here is your OTP:{}'.format(otp)
+                                        mail.send(msg)
+                                        return redirect(url_for('emailOTP'))
                                     else:
                                         return redirect(url_for('main'))
 
@@ -448,6 +464,30 @@ def verify():
     return render_template('verified.html')
 
 
+@app.route('/registerEmail2FA', methods=['GET', 'POST'])
+def registerEmail2FA():
+    email = session['verify']
+    user = User.query.filter_by(email=email).first()
+    user.TWOFAStatus = 'Email'
+    db.session.commit()
+    return render_template('email2fa.html')
+
+
+
+
+
+
+@app.route('/emailOTP', methods=['POST', 'GET'])
+def emailOTP():
+    login_form = OTPform(request.form)
+    if request.method == 'POST':
+        otp = session['emailotp']
+        otp2 = int(request.form['otp3'])
+        if otp == otp2:
+            return redirect(url_for('main'))
+        else:
+            flash(u'Invalid OTP provided')
+    return render_template('OTP.html', form=login_form)
 
 # Ravu Face Verification
 
@@ -458,10 +498,7 @@ except OSError as error:
     pass
 
 
-def sp_Register():
-    engine.say(
-        "Welcome to Radiant Finance. We will now proceed to register your face for biometric authentication. Please remove your mask and place yourself under good lighting. Press the spacebar to capture your face")
-    engine.runAndWait()
+
 
 
 @app.route('/registerFace', methods=['GET', 'POST'])
