@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab853c77-a121-4376-9b28-66a9437c7efe" name="Changes" comment="made minor changes to my stuff">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/database.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/registerFace.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/registerFace.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/setup2FA.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/setup2FA.html" afterDir="false" />
+    <list default="true" id="ab853c77-a121-4376-9b28-66a9437c7efe" name="Changes" comment="Added My face Verification">
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +128,7 @@
       <workItem from="1657778591688" duration="3330000" />
       <workItem from="1657879993046" duration="1451000" />
       <workItem from="1657978770198" duration="718000" />
-      <workItem from="1657979688391" duration="1906000" />
+      <workItem from="1657979688391" duration="2336000" />
     </task>
     <task id="LOCAL-00001" summary="Changed">
       <created>1657161258866</created>
@@ -192,7 +186,14 @@
       <option name="project" value="LOCAL" />
       <updated>1657951674553</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Added My face Verification">
+      <created>1657981639664</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1657981639664</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -218,7 +219,8 @@
     <MESSAGE value="made some changes to my new device feature" />
     <MESSAGE value="made some minor admin changes to informing user of new login" />
     <MESSAGE value="made minor changes to my stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="made minor changes to my stuff" />
+    <MESSAGE value="Added My face Verification" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added My face Verification" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/System_Security_Project$Flask____init___py_.coverage" NAME="Flask (__init__.py) Coverage Results" MODIFIED="1657181388351" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
