@@ -378,7 +378,7 @@ def login():
                             for i in range(len(newdev)):
                                 if gma() == newdev[i].macaddr and hostname == newdev[i].device_name:
                                     check = True
-                                    return redirect(url_for('main'))
+                                    return redirect(url_for('dashboard'))
                             if check == False:
                                 msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
                                               recipients=[user.email])
@@ -387,7 +387,7 @@ def login():
                                 new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
                                 db.session.add(new_dev)
                                 db.session.commit()
-                            return redirect(url_for('dashboard'))
+                                return redirect(url_for('dashboard'))
                         else:
                             return redirect(url_for('home'))
                     else:
