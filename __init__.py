@@ -378,7 +378,7 @@ def login():
                             for i in range(len(newdev)):
                                 if gma() == newdev[i].macaddr and hostname == newdev[i].device_name:
                                     check = True
-                                    return redirect(url_for('main'))
+                                    return redirect(url_for('dashboard'))
                             if check == False:
                                 msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
                                               recipients=[user.email])
