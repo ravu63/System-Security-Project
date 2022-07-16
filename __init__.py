@@ -31,8 +31,6 @@ import datetime
 from getmac import get_mac_address as gma
 import socket
 
-
-
 KEY = "8341c4d3ee5842ea9ab5a2f9192a020a"
 ENDPOINT = "https://radiant63.cognitiveservices.azure.com/"
 face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
@@ -72,6 +70,7 @@ class User(db.Model, UserMixin):
     passAttempt = (db.Column(db.Integer, nullable=False))
     TWOFAStatus = db.Column(db.String(30), nullable=False)
     FUI = db.Column(db.String(300), nullable=True)
+    FUI_ID = db.Column(db.String(300), nullable=True)
 
 
 class checkNew(db.Model):
@@ -359,7 +358,10 @@ def login():
                             for i in range(len(newdev)):
                                 if gma() == newdev[i].macaddr and hostname==newdev[i].device_name:
                                     check=True
-                                    return redirect(url_for('main'))
+                                    if user.TWOFAStatus == "Face":
+                                        return redirect(url_for('verifyFace', id=user.id))
+                                    else:
+                                        return redirect(url_for('main'))
                             if check==False:
                                 msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
                                                 recipients=[user.email])
@@ -369,6 +371,7 @@ def login():
                                 db.session.add(new_dev)
                                 db.session.commit()
                                 return redirect(url_for('main'))
+
                         elif user.role == 1:
                             session['id'] = user.id
                             session['role'] = user.role
@@ -409,7 +412,7 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None")
+                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None",FUI_ID="None")
         db.session.add(new_user)
         db.session.commit()
 
@@ -424,13 +427,6 @@ def signup():
 
 
 # Ravu Face Verification
-global capture, rec_frame, grey, switch, neg, face, rec, out
-capture = 0
-grey = 0
-neg = 0
-face = 0
-switch = 1
-rec = 0
 
 # make shots directory to save pics
 try:
@@ -438,66 +434,106 @@ try:
 except OSError as error:
     pass
 
-camera = cv2.VideoCapture(0)
+
+def sp_Register():
+    engine.say(
+        "Welcome to Radiant Finance. We will now proceed to register your face for biometric authentication. Please remove your mask and place yourself under good lighting. Press the spacebar to capture your face")
+    engine.runAndWait()
 
 
-def gen_frames():  # generate frame by frame from camera
-    global out, capture, rec_frame
-    while True:
-        success, frame = camera.read()
-        if success:
-            if (capture):
-                capture = 0
-                now = datetime.datetime.now()
-                p = os.path.sep.join(['shots', "shot_{}.jpg".format(str(now).replace(":", ''))])
-                cv2.imwrite(p, frame)
-                blob_client = blob_service_client.get_blob_client(container='radiant', blob=p)
-                with open(p, "rb") as data:
-                    blob_client.upload_blob(data)
-                url = "https://ravu63.blob.core.windows.net/radiant/" + p
-                image_url = url
-                image_url_name = os.path.basename(url)
-                see_face = face_client.face.detect_with_url(url=image_url, detection_model='detection_03')
-                if not see_face:
-                    raise Exception('No face detected from image {}'.format(image_url_name))
-                else:
-                    print("Face is detected")
-
-
-
-            try:
-                ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
-                frame = buffer.tobytes()
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            except Exception as e:
-                pass
-
-        else:
-            pass
-
-
-@app.route('/registerFace')
+@app.route('/registerFace', methods=['GET', 'POST'])
 def registerFace():
-    return render_template('registerFace.html')
+    camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    while True:
+        ret, frame = camera.read()
+        frame = cv2.putText(cv2.flip(frame, 1), "Press Space to Capture!", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 4)
+        if not ret:
+            print("failed to grab frame")
+            break
+        cv2.imshow("Register Face", frame)
+        k = cv2.waitKey(1)
+        if k % 256 == 32:  # Press Space to Capture the Face
+            now = datetime.datetime.now()
+            p = os.path.sep.join(['shots', "shot_{}.jpg".format(str(now).replace(":", ''))])
+            cv2.imwrite(p, frame)
+            blob_client = blob_service_client.get_blob_client(container='radiant', blob=p)
+            with open(p, "rb") as data:
+                blob_client.upload_blob(data)
+            url = "https://ravu63.blob.core.windows.net/radiant/" + p
+            image_url = url
+            image_url_name = os.path.basename(url)
+            see_face = face_client.face.detect_with_url(url=image_url, detection_model='detection_03',
+                                                        recognition_model='recognition_04')
+            if not see_face:
+                os.remove(p)
+                print("Face is not detected")
+                continue
+            else:
+                duncan = see_face[0].face_id
+                user = User.query.all()
+                user_id = user[-1].id
+                row_update = User.query.filter_by(id=user_id).update(dict(FUI=image_url))
+                row_update_2 = User.query.filter_by(id=user_id).update(dict(TWOFAStatus="Face"))
+                row_update_3 = User.query.filter_by(id=user_id).update(dict(FUI_ID=duncan))
+                db.session.commit()
+                print("Face is detected")
+                os.remove(p)
+                camera.release()
+                cv2.destroyAllWindows()
+                return redirect(url_for('login'))
+
+    return render_template("registerFace.html")
 
 
-@app.route('/video_feed')
-def video_feed():
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/verifyFace/<int:id>', methods=['GET', 'POST'])
+def verifyFace(id):
+    mock_try = User.query.get(id)
+    mock = mock_try.FUI_ID
+    camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    while True:
+        ret, frame = camera.read()
+        frame = cv2.putText(cv2.flip(frame, 1), "Press Space to Capture!", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            (0, 0, 255), 4)
+        if not ret:
+            print("failed to grab frame")
+            break
+        cv2.imshow("Register Face", frame)
+        k = cv2.waitKey(10)
+        if k % 256 == 32:  # Press Space to Capture the Face
+            now = datetime.datetime.now()
+            p = os.path.sep.join(['shots', "shot_{}.jpg".format(str(now).replace(":", ''))])
+            cv2.imwrite(p, frame)
+            blob_client = blob_service_client.get_blob_client(container='verification', blob=p)
+            with open(p, "rb") as data:
+                blob_client.upload_blob(data)
+            url = "https://ravu63.blob.core.windows.net/verification/" + p
+            image_url = url
+            image_url_name = os.path.basename(url)
+            see_face = face_client.face.detect_with_url(url=image_url, detection_model='detection_03',
+                                                        recognition_model='recognition_04')
+            if see_face:
+                duncan = see_face[0].face_id
+                verify = face_client.face.verify_face_to_face(
+                    face_id1=mock,
+                    face_id2=duncan
+                )
+                print(duncan)
+                print(mock)
+                print(verify.is_identical)
+                if verify.confidence > 0.91:
+                    os.remove(p)
+                    camera.release()
+                    cv2.destroyAllWindows()
+                    return redirect(url_for('main'))
+                else:
+                    os.remove(p)
+                    continue
+            else:
+                os.remove(p)
+                print("Face is not detected")
+                continue
 
-
-@app.route('/requests', methods=['POST', 'GET'])
-def tasks():
-    global switch, camera
-    if request.method == 'POST':
-        if request.form.get('click') == 'Capture':
-            global capture
-            capture = 1
-
-    elif request.method == 'GET':
-        return render_template('registerFace.html')
-    return render_template('registerFace.html')
+    return render_template('verifyFace.html')
 
 
 # End of Ravu Face shit
