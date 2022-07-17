@@ -80,6 +80,12 @@ class checkNew(db.Model):
     device_name=db.Column(db.String(30),nullable=False)
     macaddr=db.Column(db.String(17),nullable=False)
 
+class prevPass(db.Model):
+    id=db.Column(db.Integer,primary_key=True)
+    email = db.Column(db.String(30), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    dateChange = db.Column(db.Date, nullable=False)
+
 
 class Pawn(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -759,6 +765,7 @@ def change_password():
     form = UpdateCustomerForm2()
     id = session['email']
     user = User.query.filter_by(email=id).first()
+    newdev=checkNew.query.filter_by(email=id).all()
     if request.method == 'POST' and form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         today = date.today()
@@ -766,6 +773,15 @@ def change_password():
         user.passwordChange = today
         user.passAttempt = 0
         db.session.commit()
+
+        # db.session.delete(newdev)
+        # db.session.commit()
+        #
+        # hostname = socket.gethostname()
+        # new_dev = checkNew(email=id, device_name=hostname, macaddr=gma())
+        # db.session.add(new_dev)
+        # db.session.commit()
+
         session.pop('email', None)
         session.pop('otp', None)
 
@@ -871,14 +887,43 @@ def customer_change():
     id = session['id']
     form = UpdateCustomerForm2()
     user = User.query.get(id)
+    email=user.email
+    prev=prevPass.query.filter_by(email=email).all()
+    #newdev = checkNew.query.filter_by(email=id).all()
     if request.method == 'POST' and form.validate_on_submit():
+        prevCheck=False
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         today = date.today()
-        user.password = hashed_password
-        user.passwordChange = today
-        user.passAttempt = 0
-        db.session.commit()
-        return redirect(url_for('main'))
+        if len(prev)==0:
+            prevCheck=True
+        else:
+            for i in range(len(prev)):
+                if bcrypt.check_password_hash(prev[i].password, form.password.data):
+                    flash(u'Please do not use the old passwords.')
+                else:
+                    prevCheck=True
+        if prevCheck==True:
+            newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
+            db.session.add(newPrev)
+            db.session.commit()
+
+            user.password = hashed_password
+            user.passwordChange = today
+            user.passAttempt = 0
+            db.session.commit()
+            return redirect(url_for('main'))
+
+
+
+        # for i in newdev:
+        #     db.session.delete(newdev[i])
+        #     db.session.commit()
+        #
+        # hostname = socket.gethostname()
+        # new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
+        # db.session.add(new_dev)
+        # db.session.commit()
+
     return render_template('customerChangePass.html', form=form)
 
 
