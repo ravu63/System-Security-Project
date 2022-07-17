@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab853c77-a121-4376-9b28-66a9437c7efe" name="Changes" comment="made some small changes">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/515024e2-c192-48f8-aed7-77d44ca9e752.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/515024e2-c192-48f8-aed7-77d44ca9e752.xml" afterDir="false" />
+    <list default="true" id="ab853c77-a121-4376-9b28-66a9437c7efe" name="Changes" comment="added admin account">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/database.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -247,7 +244,7 @@
       <workItem from="1657978770198" duration="718000" />
       <workItem from="1657979688391" duration="2336000" />
       <workItem from="1657982116991" duration="53000" />
-      <workItem from="1658026495572" duration="8572000" />
+      <workItem from="1658026495572" duration="10888000" />
     </task>
     <task id="LOCAL-00001" summary="Changed">
       <created>1657161258866</created>
@@ -340,7 +337,21 @@
       <option name="project" value="LOCAL" />
       <updated>1657987264181</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="added some small features">
+      <created>1658045745735</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1658045745735</updated>
+    </task>
+    <task id="LOCAL-00015" summary="added admin account">
+      <created>1658045838160</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1658045838160</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -369,7 +380,9 @@
     <MESSAGE value="added some stuff" />
     <MESSAGE value="changed some database data" />
     <MESSAGE value="made some small changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="made some small changes" />
+    <MESSAGE value="added some small features" />
+    <MESSAGE value="added admin account" />
+    <option name="LAST_COMMIT_MESSAGE" value="added admin account" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/System_Security_Project$Flask____init___py_.coverage" NAME="Flask (__init__.py) Coverage Results" MODIFIED="1657181388351" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
@@ -380,7 +393,7 @@
     <SUITE FILE_PATH="coverage/project$Flask____init___py___2_.coverage" NAME="Flask (__init__.py) Coverage Results" MODIFIED="1657987216710" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/System_Security_Project$Flask____init___py___1_.coverage" NAME="Flask (__init__.py) (1) Coverage Results" MODIFIED="1657981467057" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/project$q1.coverage" NAME="q1 Coverage Results" MODIFIED="1657179776771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Downloads/pract9 Joshua 210257U/pract9 Joshua 210257U" />
-    <SUITE FILE_PATH="coverage/project$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1658045478970" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/project$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1658066423980" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/project$Flask____init___py___1_.coverage" NAME="Flask (__init__.py) (1) Coverage Results" MODIFIED="1657951706726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
