@@ -461,6 +461,11 @@ def signup():
 
     return render_template('signup.html', form=form)
 
+
+
+
+#cheston email stuff
+
 @app.route('/verifyEmail', methods=['GET', 'POST'])
 def verify():
     email=session['verify']
@@ -482,7 +487,6 @@ def registerEmail2FA():
 
 
 
-
 @app.route('/emailOTP', methods=['POST', 'GET'])
 def emailOTP():
     login_form = OTPform(request.form)
@@ -494,6 +498,8 @@ def emailOTP():
         else:
             flash(u'Invalid OTP provided')
     return render_template('OTP.html', form=login_form)
+
+#end of chestion email stuff
 
 # Ravu Face Verification
 
