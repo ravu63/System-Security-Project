@@ -524,7 +524,7 @@ def registerFace():
         cv2.imshow("Register Face", frame)
         k = cv2.waitKey(1)
         if k % 256 == 32:  # Press Space to Capture the Face
-            now = datetime.datetime.now()
+            now = datetime.now()
             p = os.path.sep.join(['shots', "shot_{}.jpg".format(str(now).replace(":", ''))])
             cv2.imwrite(p, frame)
             blob_client = blob_service_client.get_blob_client(container='radiant', blob=p)
@@ -571,7 +571,7 @@ def verifyFace(id):
         cv2.imshow("Register Face", frame)
         k = cv2.waitKey(10)
         if k % 256 == 32:  # Press Space to Capture the Face
-            now = datetime.datetime.now()
+            now = datetime.now()
             p = os.path.sep.join(['shots', "shot_{}.jpg".format(str(now).replace(":", ''))])
             cv2.imwrite(p, frame)
             blob_client = blob_service_client.get_blob_client(container='verification', blob=p)
