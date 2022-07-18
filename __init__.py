@@ -27,7 +27,6 @@ from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import os
-import datetime
 from getmac import get_mac_address as gma
 import socket
 
@@ -804,12 +803,11 @@ def change_password():
             new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
             db.session.add(new_dev)
             db.session.commit()
-            return redirect(url_for('main'))
+            return redirect(url_for('login'))
 
         session.pop('email', None)
         session.pop('otp', None)
 
-        return redirect(url_for('login'))
     return render_template('changePassword.html', form=form)
 
 
