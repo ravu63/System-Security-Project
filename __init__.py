@@ -300,6 +300,16 @@ app.static_folder = 'static'
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    try:
+        role=session['role']
+        x=True
+    except:
+        x = False
+    if x==True:
+        if role==1:
+            return redirect(url_for('dashboard'))
+        elif role==0:
+            return redirect(url_for('main'))
     return render_template('home.html')
 
 
@@ -708,6 +718,7 @@ def delete_admin(id):
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     session.pop('id', None)
+    session.pop('role',None)
     logout_user()
     return redirect(url_for('home'))
 
