@@ -786,27 +786,31 @@ def change_password():
                 else:
                     prevCheck = True
         if prevCheck == True:
-            newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
-            db.session.add(newPrev)
-            db.session.commit()
-
-            user.password = hashed_password
-            user.passwordChange = today
-            user.passAttempt = 0
-            db.session.commit()
-
-            for i in range(len(newdev)):
-                db.session.delete(newdev[i])
+            if bcrypt.check_password_hash(user.password,form.password.data):
+                flash(u'Your current password is the same as the new password you entered in.')
+            else:
+                newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
+                db.session.add(newPrev)
                 db.session.commit()
 
-            hostname = socket.gethostname()
-            new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
-            db.session.add(new_dev)
-            db.session.commit()
-            return redirect(url_for('login'))
+                user.password = hashed_password
+                user.passwordChange = today
+                user.passAttempt = 0
+                db.session.commit()
 
-        session.pop('email', None)
-        session.pop('otp', None)
+                for i in range(len(newdev)):
+                    db.session.delete(newdev[i])
+                    db.session.commit()
+
+                hostname = socket.gethostname()
+                new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
+                db.session.add(new_dev)
+                db.session.commit()
+                session.pop('email', None)
+                session.pop('otp', None)
+                return redirect(url_for('login'))
+
+
 
     return render_template('changePassword.html', form=form)
 
@@ -925,24 +929,27 @@ def customer_change():
                 else:
                     prevCheck=True
         if prevCheck==True:
-            newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
-            db.session.add(newPrev)
-            db.session.commit()
-
-            user.password = hashed_password
-            user.passwordChange = today
-            user.passAttempt = 0
-            db.session.commit()
-
-            for i in range(len(newdev)):
-                db.session.delete(newdev[i])
+            if bcrypt.check_password_hash(user.password,form.password.data):
+                flash(u'Your current password is the same as the new password you entered in.')
+            else:
+                newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
+                db.session.add(newPrev)
                 db.session.commit()
 
-            hostname = socket.gethostname()
-            new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
-            db.session.add(new_dev)
-            db.session.commit()
-            return redirect(url_for('main'))
+                user.password = hashed_password
+                user.passwordChange = today
+                user.passAttempt = 0
+                db.session.commit()
+
+                for i in range(len(newdev)):
+                    db.session.delete(newdev[i])
+                    db.session.commit()
+
+                hostname = socket.gethostname()
+                new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
+                db.session.add(new_dev)
+                db.session.commit()
+                return redirect(url_for('main'))
 
 
     return render_template('customerChangePass.html', form=form)
