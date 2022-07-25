@@ -934,6 +934,15 @@ def customer_change():
         if len(prev)==0:
             prevCheck=True
         else:
+            if len(prev)>5:
+                for i in range(len(prev)):
+                    oldest=prev[i].dateChange
+                    for j in range(i+1,len(prev)):
+                        if oldest>prev[j].dateChange:
+                            oldest=prev[j].dateChange
+                db.session.delete(oldest)
+                db.session.commit()
+
             for i in range(len(prev)):
                 if bcrypt.check_password_hash(prev[i].password, form.password.data):
                     flash(u'Please do not use the old passwords.')
