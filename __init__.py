@@ -938,7 +938,7 @@ def customer_change():
                 for i in range(len(prev)):
                     oldest=prev[i].dateChange
                     for j in range(i+1,len(prev)):
-                        if oldest>prev[j].dateChange:
+                        if oldest<prev[j].dateChange:
                             oldest=prev[j].dateChange
                     db.session.delete(prev[j])
                     db.session.commit()
