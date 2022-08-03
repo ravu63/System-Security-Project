@@ -4,9 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab853c77-a121-4376-9b28-66a9437c7efe" name="Changes" comment="fixing some small stuff">
+    <list default="true" id="794cccc2-02c9-4a24-8380-054c3c5c72b1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/d9300ff5-0403-4f48-b910-64044d30e3de.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/database.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/includes/_navbarDashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/_navbarDashboard.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,9 +23,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="Flask Main" />
-        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -28,7 +33,7 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2Baz6728MvHuca9vZa0lMIzX0JG" />
+  <component name="ProjectId" id="2CqioMkdUsabIGiSbeqP2zuliq8" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -36,25 +41,72 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/joshu/OneDrive/Desktop/School files/Data Structures and Algorithms/Lab/Pract1 Joshua 210257U&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;
-  },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
-    ]
   }
 }</component>
-  <component name="RunManager" selected="Flask server.Flask (__init__.py) (2)">
-    <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.project">
+    <configuration default="true" type="DjangoTestsConfigurationType">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="TARGET" value="" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="PyBehaveRunConfigurationType" factoryName="Behave">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="ADDITIONAL_ARGS" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="project" type="PythonConfigurationType" factoryName="Python">
       <module name="project" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -62,8 +114,8 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -76,35 +128,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <module name="System-Security-Project" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Flask (__init__.py) (1)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
-      <module name="System-Security-Project" />
+    <configuration name="Flask (__init__.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
+      <module name="project" />
       <option name="target" value="$PROJECT_DIR$/__init__.py" />
       <option name="targetType" value="PATH" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="C:\Users\prem\AppData\Local\Programs\Python\Python310\python.exe" />
+      <option name="SDK_HOME" value="C:\Users\joshu\AppData\Local\Programs\Python\Python39\python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -113,78 +143,20 @@
       <option name="launchJavascriptDebuger" value="false" />
       <method v="2" />
     </configuration>
-    <configuration name="Flask (__init__.py) (2)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
-      <module name="project" />
-      <option name="target" value="$PROJECT_DIR$/__init__.py" />
-      <option name="targetType" value="PATH" />
+    <configuration default="true" type="Python.FlaskServer">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="launchJavascriptDebuger" value="false" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Flask (__init__.py)" type="Python.FlaskServer" nameIsGenerated="true">
-      <module name="project" />
-      <option name="target" value="C:\Users\prem\OneDrive\Desktop\NYP\Year 2\Sem 1\Systems Security Project\System-Security-Project\__init__.py" />
-      <option name="targetType" value="PATH" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="FLASK_DEBUG" value="1" />
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="launchJavascriptDebuger" value="false" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Flask (__init__.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
-      <module name="project" />
-      <option name="target" value="$PROJECT_DIR$/__init__.py" />
-      <option name="targetType" value="PATH" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="FLASK_DEBUG" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="launchJavascriptDebuger" value="false" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Flask (__init__.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
-      <module name="System-Security-Project" />
-      <option name="target" value="$PROJECT_DIR$/__init__.py" />
-      <option name="targetType" value="PATH" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="FLASK_DEBUG" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="launchJavascriptDebuger" value="false" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="Tox" factoryName="Tox">
-      <module name="System-Security-Project" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
@@ -195,8 +167,7 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <method v="2" />
     </configuration>
-    <configuration default="true" type="tests" factoryName="Autodetect">
-      <module name="System-Security-Project" />
+    <configuration default="true" type="docs" factoryName="Docutils task">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
@@ -204,14 +175,33 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <option name="docutils_input_file" value="" />
+      <option name="docutils_output_file" value="" />
+      <option name="docutils_params" value="" />
+      <option name="docutils_task" value="" />
+      <option name="docutils_open_in_browser" value="false" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docs" factoryName="Sphinx task">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="docutils_input_file" value="" />
+      <option name="docutils_output_file" value="" />
+      <option name="docutils_params" value="" />
+      <option name="docutils_task" value="" />
+      <option name="docutils_open_in_browser" value="false" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="tests" factoryName="Doctests">
-      <module name="System-Security-Project" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
@@ -219,6 +209,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="" />
       <option name="CLASS_NAME" value="" />
@@ -229,12 +220,12 @@
       <option name="USE_PATTERN" value="false" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Flask server.Flask (__init__.py)" />
+      <item itemvalue="Python.project" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Flask server.Flask (__init__.py) (2)" />
-        <item itemvalue="Python.__init__" />
-        <item itemvalue="Flask server.Flask (__init__.py)" />
-        <item itemvalue="Flask server.Flask (__init__.py) (1)" />
         <item itemvalue="Flask server.Flask (__init__.py)" />
       </list>
     </recent_temporary>
@@ -242,254 +233,21 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="ab853c77-a121-4376-9b28-66a9437c7efe" name="Changes" comment="" />
-      <created>1657158806711</created>
+      <changelist id="794cccc2-02c9-4a24-8380-054c3c5c72b1" name="Changes" comment="" />
+      <created>1659536689807</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1657158806711</updated>
-      <workItem from="1657158812530" duration="3683000" />
-      <workItem from="1657179491919" duration="2291000" />
-      <workItem from="1657424985124" duration="7306000" />
-      <workItem from="1657544838422" duration="1131000" />
-      <workItem from="1657597021292" duration="4786000" />
-      <workItem from="1657715127954" duration="2895000" />
-      <workItem from="1657719155927" duration="22000" />
-      <workItem from="1657778591688" duration="3330000" />
-      <workItem from="1657879993046" duration="1451000" />
-      <workItem from="1657978770198" duration="718000" />
-      <workItem from="1657979688391" duration="2336000" />
-      <workItem from="1657982116991" duration="53000" />
-      <workItem from="1658026495572" duration="11236000" />
-      <workItem from="1658106705026" duration="4151000" />
-      <workItem from="1658112017468" duration="254000" />
-      <workItem from="1658116610639" duration="419000" />
-      <workItem from="1658119015539" duration="475000" />
-      <workItem from="1658420789459" duration="1723000" />
-      <workItem from="1658510997714" duration="638000" />
-      <workItem from="1658512042357" duration="2118000" />
-      <workItem from="1658561477999" duration="2479000" />
-      <workItem from="1658638229238" duration="1955000" />
-      <workItem from="1658648894367" duration="1087000" />
-      <workItem from="1658716657133" duration="2180000" />
-      <workItem from="1658756696592" duration="591000" />
-      <workItem from="1658808092590" duration="1784000" />
-      <workItem from="1658920750269" duration="1211000" />
-      <workItem from="1658976264167" duration="1211000" />
-      <workItem from="1659430364093" duration="576000" />
-      <workItem from="1659534298198" duration="1079000" />
-      <workItem from="1659535980347" duration="535000" />
+      <updated>1659536689807</updated>
+      <workItem from="1659536699384" duration="1471000" />
+      <workItem from="1659538484122" duration="995000" />
     </task>
-    <task id="LOCAL-00001" summary="Changed">
-      <created>1657161258866</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1657161258866</updated>
-    </task>
-    <task id="LOCAL-00002" summary="started on my informing of new device login feature">
-      <created>1657470330128</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1657470330128</updated>
-    </task>
-    <task id="LOCAL-00003" summary="made some small changes">
-      <created>1657545662488</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1657545662488</updated>
-    </task>
-    <task id="LOCAL-00004" summary="using dev name and mac address to find new device">
-      <created>1657718642464</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1657718642464</updated>
-    </task>
-    <task id="LOCAL-00005" summary="push for some workspace changes ig">
-      <created>1657719705162</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1657719705162</updated>
-    </task>
-    <task id="LOCAL-00006" summary="made some changes to my new device feature">
-      <created>1657782826065</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1657782826065</updated>
-    </task>
-    <task id="LOCAL-00007" summary="made some minor admin changes to informing user of new login">
-      <created>1657880481009</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1657880481009</updated>
-    </task>
-    <task id="LOCAL-00008" summary="made minor changes to my stuff">
-      <created>1657951674553</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1657951674553</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Added My face Verification">
-      <created>1657981639664</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1657981639664</updated>
-    </task>
-    <task id="LOCAL-00010" summary="added some stuff">
-      <created>1657984843355</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1657984843355</updated>
-    </task>
-    <task id="LOCAL-00011" summary="changed some database data">
-      <created>1657985524533</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1657985524533</updated>
-    </task>
-    <task id="LOCAL-00012" summary="made some small changes">
-      <created>1657985657380</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1657985657380</updated>
-    </task>
-    <task id="LOCAL-00013" summary="made some small changes">
-      <created>1657987264181</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1657987264181</updated>
-    </task>
-    <task id="LOCAL-00014" summary="added some small features">
-      <created>1658045745735</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1658045745735</updated>
-    </task>
-    <task id="LOCAL-00015" summary="added admin account">
-      <created>1658045838160</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1658045838160</updated>
-    </task>
-    <task id="LOCAL-00016" summary="made some minor changes">
-      <created>1658066563403</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1658066563403</updated>
-    </task>
-    <task id="LOCAL-00017" summary="added some identifiers">
-      <created>1658066691156</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1658066691156</updated>
-    </task>
-    <task id="LOCAL-00018" summary="added account">
-      <created>1658110160018</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1658110160018</updated>
-    </task>
-    <task id="LOCAL-00019" summary="added check if current pass is same as new password">
-      <created>1658386373020</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1658386373020</updated>
-    </task>
-    <task id="LOCAL-00020" summary="made some small changes">
-      <created>1658591047395</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1658591047395</updated>
-    </task>
-    <task id="LOCAL-00021" summary="trying to implement max 5 old password stored in database">
-      <created>1658717647915</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1658717647915</updated>
-    </task>
-    <task id="LOCAL-00022" summary="fixing some small stuff">
-      <created>1659535278276</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1659535278276</updated>
-    </task>
-    <task id="LOCAL-00023" summary="fixing some small stuff">
-      <created>1659536010365</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1659536010365</updated>
-    </task>
-    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="Changed" />
-    <MESSAGE value="started on my informing of new device login feature" />
-    <MESSAGE value="using dev name and mac address to find new device" />
-    <MESSAGE value="push for some workspace changes ig" />
-    <MESSAGE value="made some changes to my new device feature" />
-    <MESSAGE value="made some minor admin changes to informing user of new login" />
-    <MESSAGE value="made minor changes to my stuff" />
-    <MESSAGE value="Added My face Verification" />
-    <MESSAGE value="added some stuff" />
-    <MESSAGE value="changed some database data" />
-    <MESSAGE value="added some small features" />
-    <MESSAGE value="added admin account" />
-    <MESSAGE value="made some minor changes" />
-    <MESSAGE value="added some identifiers" />
-    <MESSAGE value="added account" />
-    <MESSAGE value="added check if current pass is same as new password" />
-    <MESSAGE value="made some small changes" />
-    <MESSAGE value="trying to implement max 5 old password stored in database" />
-    <MESSAGE value="fixing some small stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixing some small stuff" />
-  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/project$Flask____init___py___2_.coverage" NAME="Flask (__init__.py) (2) Coverage Results" MODIFIED="1659536508540" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/System_Security_Project$Flask____init___py___2_.coverage" NAME="Flask (__init__.py) (2) Coverage Results" MODIFIED="1658119292011" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/project$q1.coverage" NAME="q1 Coverage Results" MODIFIED="1657179776771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Downloads/pract9 Joshua 210257U/pract9 Joshua 210257U" />
-    <SUITE FILE_PATH="coverage/project$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1658106741401" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/project$Flask____init___py___1_.coverage" NAME="Flask (__init__.py) (1) Coverage Results" MODIFIED="1657951706726" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/project$q2.coverage" NAME="q2 Coverage Results" MODIFIED="1657179785743" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Downloads/pract9 Joshua 210257U/pract9 Joshua 210257U" />
-    <SUITE FILE_PATH="coverage/System_Security_Project$Flask____init___py_.coverage" NAME="Flask (__init__.py) Coverage Results" MODIFIED="1657181388351" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/System_Security_Project$Flask____init___py___1_.coverage" NAME="Flask (__init__.py) (1) Coverage Results" MODIFIED="1657981467057" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/System_Security_Project$System_Security_Project.coverage" NAME="System-Security-Project Coverage Results" MODIFIED="1657160048672" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/System_Security_Project$bla.coverage" NAME="bla Coverage Results" MODIFIED="1657160983035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/System_Security_Project$jk.coverage" NAME="jk Coverage Results" MODIFIED="1657181658924" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/project$Flask____init___py_.coverage" NAME="Flask (__init__.py) Coverage Results" MODIFIED="1659538279962" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/project$project.coverage" NAME="project Coverage Results" MODIFIED="1659539481205" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

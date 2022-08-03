@@ -785,41 +785,44 @@ def change_password():
     prev = prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
-        prevCheck=False
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
-        today = date.today()
-        if len(prev) == 0:
-            prevCheck = True
-        else:
-            for i in range(len(prev)):
-                if bcrypt.check_password_hash(prev[i].password, form.password.data):
-                    flash(u'Please do not use the old passwords.')
-                else:
-                    prevCheck = True
-        if prevCheck == True:
-            if bcrypt.check_password_hash(user.password,form.password.data):
-                flash(u'Your current password is the same as the new password you entered in.')
+        rightnow = date.today()
+        day = rightnow - user.passwordChange
+        if day.days > 5:
+            prevCheck=False
+            hashed_password = bcrypt.generate_password_hash(form.password.data)
+            today = date.today()
+            if len(prev) == 0:
+                prevCheck = True
             else:
-                newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
-                db.session.add(newPrev)
-                db.session.commit()
-
-                user.password = hashed_password
-                user.passwordChange = today
-                user.passAttempt = 0
-                db.session.commit()
-
-                for i in range(len(newdev)):
-                    db.session.delete(newdev[i])
+                for i in range(len(prev)):
+                    if bcrypt.check_password_hash(prev[i].password, form.password.data):
+                        flash(u'Please do not use the old passwords.')
+                    else:
+                        prevCheck = True
+            if prevCheck == True:
+                if bcrypt.check_password_hash(user.password,form.password.data):
+                    flash(u'Your current password is the same as the new password you entered in.')
+                else:
+                    newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
+                    db.session.add(newPrev)
                     db.session.commit()
 
-                hostname = socket.gethostname()
-                new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
-                db.session.add(new_dev)
-                db.session.commit()
-                session.pop('email', None)
-                session.pop('otp', None)
-                return redirect(url_for('login'))
+                    user.password = hashed_password
+                    user.passwordChange = today
+                    user.passAttempt = 0
+                    db.session.commit()
+
+                    for i in range(len(newdev)):
+                        db.session.delete(newdev[i])
+                        db.session.commit()
+
+                    hostname = socket.gethostname()
+                    new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
+                    db.session.add(new_dev)
+                    db.session.commit()
+                    session.pop('email', None)
+                    session.pop('otp', None)
+                    return redirect(url_for('login'))
 
 
 
@@ -928,9 +931,9 @@ def customer_change():
     prev=prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
-        rightnow=date.today()
-        day=rightnow-user.passwordChange
-        if day.days>5:
+        #rightnow=date.today()
+        #day=rightnow-user.passwordChange
+        #if day.days>5:
             prevCheck=False
             hashed_password = bcrypt.generate_password_hash(form.password.data)
             today = date.today()
@@ -941,9 +944,9 @@ def customer_change():
                     for i in range(len(prev)):
                         oldest=prev[i].dateChange
                         for j in range(i+1,len(prev)):
-                            if oldest<prev[j].dateChange:
+                            if oldest>prev[j].dateChange:
                                 oldest=prev[j].dateChange
-                        db.session.delete(prev[j])
+                        db.session.delete(oldest)
                         db.session.commit()
 
                 for i in range(len(prev)):
@@ -972,8 +975,14 @@ def customer_change():
                     new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
                     db.session.add(new_dev)
                     db.session.commit()
-                    return redirect(url_for('main'))
-
+                    if user.role==0:
+                        return redirect(url_for('main'))
+                    elif user.role==1:
+                        return redirect(url_for('dashboard'))
+                    else:
+                        return redirect(url_for('home'))
+        #else:
+        #    flash(u'You are only allowed to change your password once every 5 days.')
 
     return render_template('customerChangePass.html', form=form)
 
