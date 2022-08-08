@@ -28,13 +28,9 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import os
 from getmac import get_mac_address as gma
 import socket
-import pyttsx3
+import win32com.client as wincl
 
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
-rate = engine.getProperty('rate')
-engine.setProperty('rate', 120)
+speak = wincl.Dispatch("SAPI.SpVoice")
 
 KEY = "8341c4d3ee5842ea9ab5a2f9192a020a"
 ENDPOINT = "https://radiant63.cognitiveservices.azure.com/"
@@ -521,21 +517,26 @@ except OSError as error:
 
 
 def instruct():
-    engine.say(
-        "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Registration. The camera window will take some time to load up.Press Space to capture the image")
-    engine.runAndWait()
-    engine.stop()
-
+    speak.Speak(
+        "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Registration.The camera window will take some time to load up.Press Space to capture the image")
 
 def face_cancelled():
-    engine.say("There is no face recognised.Please press the space bar to capture your face")
-    engine.runAndWait()
-    engine.stop()
+    speak.Speak("There is no face recognised.Please press the space bar to capture your face")
+
 
 def face_successful():
-    engine.say("Face Registration is done successfully!")
-    engine.runAndWait()
-    engine.stop()
+    speak.Speak("Face Registration is done successfully!")
+
+def instruct_verify():
+    speak.Speak(
+        "Welcome to Radiant Finance!We will now proceed to 2 Factor-Authentication Facial Verification.The camera window will take some time to load up.Press Space to capture the image")
+
+def face_verified():
+    speak.Speak("Face is verified.Now,you will be redirected back to the main page!")
+
+def face_not_verified():
+    speak.Speak("Face does not match.Please try again!")
+
 
 @app.route('/registerFace', methods=['GET', 'POST'])
 def registerFace():
@@ -590,6 +591,7 @@ def verifyFace(id):
     mock_try = User.query.get(id)
     mock = mock_try.FUI_ID
     camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    instruct_verify()
     while True:
         ret, frame = camera.read()
         frame = cv2.putText(cv2.flip(frame, 1), "Press Space to Capture!", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1,
@@ -621,6 +623,7 @@ def verifyFace(id):
                 print(mock)
                 print(verify.is_identical)
                 if verify.confidence > 0.91:
+                    face_verified()
                     os.remove(p)
                     camera.release()
                     cv2.destroyAllWindows()
@@ -629,6 +632,7 @@ def verifyFace(id):
                     os.remove(p)
                     continue
             else:
+                face_cancelled()
                 os.remove(p)
                 print("Face is not detected")
                 continue

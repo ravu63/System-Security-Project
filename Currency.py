@@ -4,15 +4,11 @@ import threading
 
 videoCaptureObject = cv2.VideoCapture(0)
 
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
-rate = engine.getProperty('rate')
-engine.setProperty('rate', 120)
-
+import win32com.client as wincl
+speak = wincl.Dispatch("SAPI.SpVoice")
 
 def instruct():
-    engine.say("Hi! I am Ravu")
+    speak.Speak("Hello World")
 
 
 def capture():
