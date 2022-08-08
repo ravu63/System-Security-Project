@@ -9,12 +9,11 @@ from Forms import OTPform, \
     PawnStatus, \
     PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
 from flask_wtf import FlaskForm
+import threading
 from wtforms import StringField, validators, PasswordField, SelectField, TextAreaField, \
     SubmitField
 from wtforms.fields import EmailField, DateField
 from wtforms.validators import ValidationError
-from transaction import CustomerPurchase
-from Currency import Currency
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
@@ -29,6 +28,13 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import os
 from getmac import get_mac_address as gma
 import socket
+import pyttsx3
+
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
+rate = engine.getProperty('rate')
+engine.setProperty('rate', 120)
 
 KEY = "8341c4d3ee5842ea9ab5a2f9192a020a"
 ENDPOINT = "https://radiant63.cognitiveservices.azure.com/"
@@ -74,13 +80,14 @@ class User(db.Model, UserMixin):
 
 
 class checkNew(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
-    email=db.Column(db.String(30),nullable=False)
-    device_name=db.Column(db.String(30),nullable=False)
-    macaddr=db.Column(db.String(17),nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(30), nullable=False)
+    device_name = db.Column(db.String(30), nullable=False)
+    macaddr = db.Column(db.String(17), nullable=False)
+
 
 class prevPass(db.Model):
-    id=db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     dateChange = db.Column(db.Date, nullable=False)
@@ -102,7 +109,6 @@ class Pawn(db.Model):
     period = db.Column(db.String(10), nullable=False)
     sui = db.Column(db.String(10), nullable=False)
     pawn_status = db.Column(db.String(10), nullable=False)
-
 
 
 class Transaction(db.Model):
@@ -301,14 +307,14 @@ app.static_folder = 'static'
 @app.route('/', methods=['GET', 'POST'])
 def home():
     try:
-        role=session['role']
-        x=True
+        role = session['role']
+        x = True
     except:
         x = False
-    if x==True:
-        if role==1:
+    if x == True:
+        if role == 1:
             return redirect(url_for('dashboard'))
-        elif role==0:
+        elif role == 0:
             return redirect(url_for('main'))
     return render_template('home.html')
 
@@ -341,16 +347,15 @@ def page_not_found(e):
     return render_template('error404.html'), 404
 
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         current = date.today()
         user = User.query.filter_by(email=form.email.data).first()
-        newdev=checkNew.query.filter_by(email=form.email.data).all()
+        newdev = checkNew.query.filter_by(email=form.email.data).all()
         if user:
-            if user.verified==1:
+            if user.verified == 1:
                 if user.passAttempt > 2:
                     flash(u'Too many failed password attepmts. Please reset password.')
                 else:
@@ -371,10 +376,10 @@ def login():
                                 session['role'] = user.role
                                 user.passAttempt = 0
                                 db.session.commit()
-                                check=False
+                                check = False
                                 for i in range(len(newdev)):
-                                    if gma() == newdev[i].macaddr and hostname==newdev[i].device_name:
-                                        check=True
+                                    if gma() == newdev[i].macaddr and hostname == newdev[i].device_name:
+                                        check = True
                                         if user.TWOFAStatus == "Face":
                                             return redirect(url_for('verifyFace', id=user.id))
                                         elif user.TWOFAStatus == 'Email':
@@ -387,9 +392,9 @@ def login():
                                             return redirect(url_for('emailOTP'))
                                         else:
                                             return redirect(url_for('main'))
-                                if check==False:
+                                if check == False:
                                     msg = Message('Login to new Device', sender='radiantfinancenyp@gmail.com',
-                                                    recipients=[user.email])
+                                                  recipients=[user.email])
                                     msg.body = 'There is a new device login. If this is not you, please change your password immediately'
                                     mail.send(msg)
                                     new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
@@ -397,7 +402,7 @@ def login():
                                     db.session.commit()
                                     if user.TWOFAStatus == "Face":
                                         return redirect(url_for('verifyFace', id=user.id))
-                                    elif user.TWOFAStatus=='Email':
+                                    elif user.TWOFAStatus == 'Email':
                                         otp = random.randint(1111, 9999)
                                         session['emailotp'] = otp
                                         msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com',
@@ -450,7 +455,7 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=today, passAttempt=0, TWOFAStatus='None',FUI="None",FUI_ID="None",verified=0)
+                        passwordChange=today, passAttempt=0, TWOFAStatus='None', FUI="None", FUI_ID="None", verified=0)
         db.session.add(new_user)
         db.session.commit()
 
@@ -459,10 +464,10 @@ def signup():
         link = url_for('verify', _external=True)
         msg.body = 'Please click the link to verify your email {}'.format(link)
         mail.send(msg)
-        session['verify']=form.email.data
+        session['verify'] = form.email.data
 
         hostname = socket.gethostname()
-        new_dev=checkNew(email=form.email.data,device_name=hostname,macaddr=gma())
+        new_dev = checkNew(email=form.email.data, device_name=hostname, macaddr=gma())
         db.session.add(new_dev)
         db.session.commit()
         if new_user.TWOFAStatus == "None":
@@ -471,15 +476,13 @@ def signup():
     return render_template('signup.html', form=form)
 
 
-
-
-#cheston email stuff
+# cheston email stuff
 
 @app.route('/verifyEmail', methods=['GET', 'POST'])
 def verify():
-    email=session['verify']
-    user=User.query.filter_by(email=email).first()
-    user.verified=1
+    email = session['verify']
+    user = User.query.filter_by(email=email).first()
+    user.verified = 1
     db.session.commit()
     return render_template('verified.html')
 
@@ -491,9 +494,6 @@ def registerEmail2FA():
     user.TWOFAStatus = 'Email'
     db.session.commit()
     return render_template('email2fa.html')
-
-
-
 
 
 @app.route('/emailOTP', methods=['POST', 'GET'])
@@ -508,7 +508,8 @@ def emailOTP():
             flash(u'Invalid OTP provided')
     return render_template('OTP.html', form=login_form)
 
-#end of chestion email stuff
+
+# end of chestion email stuff
 
 # Ravu Face Verification
 
@@ -519,15 +520,31 @@ except OSError as error:
     pass
 
 
+def instruct():
+    engine.say(
+        "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Registration. The camera window will take some time to load up.Press Space to capture the image")
+    engine.runAndWait()
+    engine.stop()
 
 
+def face_cancelled():
+    engine.say("There is no face recognised.Please press the space bar to capture your face")
+    engine.runAndWait()
+    engine.stop()
+
+def face_successful():
+    engine.say("Face Registration is done successfully!")
+    engine.runAndWait()
+    engine.stop()
 
 @app.route('/registerFace', methods=['GET', 'POST'])
 def registerFace():
     camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    instruct()
     while True:
         ret, frame = camera.read()
-        frame = cv2.putText(cv2.flip(frame, 1), "Press Space to Capture!", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 4)
+        frame = cv2.putText(cv2.flip(frame, 1), "Press Space to Capture!", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            (0, 0, 255), 4)
         if not ret:
             print("failed to grab frame")
             break
@@ -546,10 +563,12 @@ def registerFace():
             see_face = face_client.face.detect_with_url(url=image_url, detection_model='detection_03',
                                                         recognition_model='recognition_04')
             if not see_face:
+                face_cancelled()
                 os.remove(p)
                 print("Face is not detected")
                 continue
             else:
+                face_successful()
                 duncan = see_face[0].face_id
                 user = User.query.all()
                 user_id = user[-1].id
@@ -634,7 +653,7 @@ def create_admin():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=1,
-                        passwordChange=today, passAttempt=0, TWOFAStatus='idk',verified=1)
+                        passwordChange=today, passAttempt=0, TWOFAStatus='idk', verified=1)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('manage_admin'))
@@ -718,7 +737,7 @@ def delete_admin(id):
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
     session.pop('id', None)
-    session.pop('role',None)
+    session.pop('role', None)
     logout_user()
     return redirect(url_for('home'))
 
@@ -781,14 +800,14 @@ def change_password():
     form = UpdateCustomerForm2()
     id = session['email']
     user = User.query.filter_by(email=id).first()
-    email=user.email
+    email = user.email
     prev = prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
         rightnow = date.today()
         day = rightnow - user.passwordChange
         if day.days > 5:
-            prevCheck=False
+            prevCheck = False
             hashed_password = bcrypt.generate_password_hash(form.password.data)
             today = date.today()
             if len(prev) == 0:
@@ -800,7 +819,7 @@ def change_password():
                     else:
                         prevCheck = True
             if prevCheck == True:
-                if bcrypt.check_password_hash(user.password,form.password.data):
+                if bcrypt.check_password_hash(user.password, form.password.data):
                     flash(u'Your current password is the same as the new password you entered in.')
                 else:
                     newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
@@ -823,8 +842,6 @@ def change_password():
                     session.pop('email', None)
                     session.pop('otp', None)
                     return redirect(url_for('login'))
-
-
 
     return render_template('changePassword.html', form=form)
 
@@ -927,62 +944,62 @@ def customer_change():
     id = session['id']
     form = UpdateCustomerForm2()
     user = User.query.get(id)
-    email=user.email
-    prev=prevPass.query.filter_by(email=email).all()
+    email = user.email
+    prev = prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
-        #rightnow=date.today()
-        #day=rightnow-user.passwordChange
-        #if day.days>5:
-            prevCheck=False
-            hashed_password = bcrypt.generate_password_hash(form.password.data)
-            today = date.today()
-            if len(prev)==0:
-                prevCheck=True
-            else:
-                if len(prev)>=5:
-                    oldest=prev[0]
-                    for j in range(1,len(prev)):
-                        if prev[0].dateChange>prev[j].dateChange:
-                            oldest=prev[j]
-                            # the oldest password rn is joshua1234567890
-                    db.session.delete(oldest)
-                    db.session.commit()
+        # rightnow=date.today()
+        # day=rightnow-user.passwordChange
+        # if day.days>5:
+        prevCheck = False
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
+        if len(prev) == 0:
+            prevCheck = True
+        else:
+            if len(prev) >= 5:
+                oldest = prev[0]
+                for j in range(1, len(prev)):
+                    if prev[0].dateChange > prev[j].dateChange:
+                        oldest = prev[j]
+                        # the oldest password rn is joshua1234567890
+                db.session.delete(oldest)
+                db.session.commit()
 
-                for i in range(len(prev)):
-                    if bcrypt.check_password_hash(prev[i].password, form.password.data):
-                        flash(u'Please do not use the old passwords.')
-                    else:
-                        prevCheck=True
-            if prevCheck==True:
-                if bcrypt.check_password_hash(user.password,form.password.data):
-                    flash(u'Your current password is the same as the new password you entered in.')
+            for i in range(len(prev)):
+                if bcrypt.check_password_hash(prev[i].password, form.password.data):
+                    flash(u'Please do not use the old passwords.')
                 else:
-                    newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
-                    db.session.add(newPrev)
+                    prevCheck = True
+        if prevCheck == True:
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                flash(u'Your current password is the same as the new password you entered in.')
+            else:
+                newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
+                db.session.add(newPrev)
+                db.session.commit()
+
+                user.password = hashed_password
+                user.passwordChange = today
+                user.passAttempt = 0
+                db.session.commit()
+
+                for i in range(len(newdev)):
+                    db.session.delete(newdev[i])
                     db.session.commit()
 
-                    user.password = hashed_password
-                    user.passwordChange = today
-                    user.passAttempt = 0
-                    db.session.commit()
-
-                    for i in range(len(newdev)):
-                        db.session.delete(newdev[i])
-                        db.session.commit()
-
-                    hostname = socket.gethostname()
-                    new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
-                    db.session.add(new_dev)
-                    db.session.commit()
-                    if user.role==0:
-                        return redirect(url_for('main'))
-                    elif user.role==1:
-                        return redirect(url_for('dashboard'))
-                    else:
-                        return redirect(url_for('home'))
-        #else:
-        #    flash(u'You are only allowed to change your password once every 5 days.')
+                hostname = socket.gethostname()
+                new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
+                db.session.add(new_dev)
+                db.session.commit()
+                if user.role == 0:
+                    return redirect(url_for('main'))
+                elif user.role == 1:
+                    return redirect(url_for('dashboard'))
+                else:
+                    return redirect(url_for('home'))
+    # else:
+    #    flash(u'You are only allowed to change your password once every 5 days.')
 
     return render_template('customerChangePass.html', form=form)
 
@@ -1039,6 +1056,8 @@ def create_loan():
         db.session.commit()
         return redirect(url_for('retrieve_loan'))
     return render_template('createLoan.html', form=create_loan_form)
+
+
 #
 # @login_manager.user_loader
 # def load_user(user_id):
@@ -1280,7 +1299,6 @@ def filter_status():
 
 
 # End of Ravu
-
 
 if __name__ == '__main__':
     app.run()

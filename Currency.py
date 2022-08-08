@@ -1,18 +1,29 @@
-class Currency:
-    def __init__(self, amount, initial, to, *args):
-        super().__init__(*args)
-        self.amount = amount
-        self.initial = initial
-        self.to = to
+import pyttsx3
+import cv2
+import threading
 
-    def getInitial(self):
-        return self.initial
+videoCaptureObject = cv2.VideoCapture(0)
 
-    def getTo(self):
-        return self.to
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
+rate = engine.getProperty('rate')
+engine.setProperty('rate', 120)
 
-    def getAmount(self):
-        return self.amount
 
+def instruct():
+    engine.say("Hi! I am Ravu")
+
+
+def capture():
+    instruct()
+    while (True):
+        ret, frame = videoCaptureObject.read()
+        cv2.imshow('Capturing Video', frame)
+        if (cv2.waitKey(1) & 0xFF == ord('q')):
+            videoCaptureObject.release()
+            cv2.destroyAllWindows()
+
+capture()
 
 
