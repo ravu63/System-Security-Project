@@ -846,6 +846,8 @@ def change_password():
                     session.pop('email', None)
                     session.pop('otp', None)
                     return redirect(url_for('login'))
+        else:
+            flash(u'You are only allowed to change your password once every 5 days.')
 
     return render_template('changePassword.html', form=form)
 
@@ -952,58 +954,58 @@ def customer_change():
     prev = prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
-        # rightnow=date.today()
-        # day=rightnow-user.passwordChange
-        # if day.days>5:
-        prevCheck = False
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
-        today = date.today()
-        if len(prev) == 0:
-            prevCheck = True
-        else:
-            if len(prev) >= 5:
-                oldest = prev[0]
-                for j in range(1, len(prev)):
-                    if prev[0].dateChange > prev[j].dateChange:
-                        oldest = prev[j]
-                        # the oldest password rn is joshua1234567890
-                db.session.delete(oldest)
-                db.session.commit()
-
-            for i in range(len(prev)):
-                if bcrypt.check_password_hash(prev[i].password, form.password.data):
-                    flash(u'Please do not use the old passwords.')
-                else:
-                    prevCheck = True
-        if prevCheck == True:
-            if bcrypt.check_password_hash(user.password, form.password.data):
-                flash(u'Your current password is the same as the new password you entered in.')
+        rightnow=date.today()
+        day=rightnow-user.passwordChange
+        if day.days>5:
+            prevCheck = False
+            hashed_password = bcrypt.generate_password_hash(form.password.data)
+            today = date.today()
+            if len(prev) == 0:
+                prevCheck = True
             else:
-                newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
-                db.session.add(newPrev)
-                db.session.commit()
-
-                user.password = hashed_password
-                user.passwordChange = today
-                user.passAttempt = 0
-                db.session.commit()
-
-                for i in range(len(newdev)):
-                    db.session.delete(newdev[i])
+                if len(prev) >= 5:
+                    oldest = prev[0]
+                    for j in range(1, len(prev)):
+                        if prev[0].dateChange > prev[j].dateChange:
+                            oldest = prev[j]
+                            # the oldest password rn is joshua1234567890
+                    db.session.delete(oldest)
                     db.session.commit()
 
-                hostname = socket.gethostname()
-                new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
-                db.session.add(new_dev)
-                db.session.commit()
-                if user.role == 0:
-                    return redirect(url_for('main'))
-                elif user.role == 1:
-                    return redirect(url_for('dashboard'))
+                for i in range(len(prev)):
+                    if bcrypt.check_password_hash(prev[i].password, form.password.data):
+                        flash(u'Please do not use the old passwords.')
+                    else:
+                        prevCheck = True
+            if prevCheck == True:
+                if bcrypt.check_password_hash(user.password, form.password.data):
+                    flash(u'Your current password is the same as the new password you entered in.')
                 else:
-                    return redirect(url_for('home'))
-    # else:
-    #    flash(u'You are only allowed to change your password once every 5 days.')
+                    newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
+                    db.session.add(newPrev)
+                    db.session.commit()
+
+                    user.password = hashed_password
+                    user.passwordChange = today
+                    user.passAttempt = 0
+                    db.session.commit()
+
+                    for i in range(len(newdev)):
+                        db.session.delete(newdev[i])
+                        db.session.commit()
+
+                    hostname = socket.gethostname()
+                    new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
+                    db.session.add(new_dev)
+                    db.session.commit()
+                    if user.role == 0:
+                        return redirect(url_for('main'))
+                    elif user.role == 1:
+                        return redirect(url_for('dashboard'))
+                    else:
+                        return redirect(url_for('home'))
+        else:
+            flash(u'You are only allowed to change your password once every 5 days.')
 
     return render_template('customerChangePass.html', form=form)
 
