@@ -28,4 +28,4 @@ azure-cognitiveservices-vision-face==0.6.0
 opencv-python==4.6.0.66
 pytz==2022.1
 getmac==0.8.3
-pyttsx3==2.90
+

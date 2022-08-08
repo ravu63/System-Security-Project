@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c0294411-fdeb-4f7e-aae7-fe945f5be642" name="Changes" comment="Added Sound Engine. Threading still in progress">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Currency.py" beforeDir="false" afterPath="$PROJECT_DIR$/Currency.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/database.db" afterDir="false" />
-    </list>
+    <list default="true" id="c0294411-fdeb-4f7e-aae7-fe945f5be642" name="Changes" comment="Sound Engine Modified to fit without threading needed" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -110,7 +105,7 @@
       <updated>1659954326202</updated>
       <workItem from="1659954378230" duration="2657000" />
       <workItem from="1659960613761" duration="1110000" />
-      <workItem from="1659962321923" duration="7343000" />
+      <workItem from="1659962321923" duration="7705000" />
     </task>
     <task id="LOCAL-00001" summary="Added Sound Engine. Threading still in progress">
       <created>1659970012623</created>
@@ -119,7 +114,14 @@
       <option name="project" value="LOCAL" />
       <updated>1659970012623</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Sound Engine Modified to fit without threading needed">
+      <created>1659972217851</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1659972217851</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -138,10 +140,11 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added Sound Engine. Threading still in progress" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Sound Engine. Threading still in progress" />
+    <MESSAGE value="Sound Engine Modified to fit without threading needed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Sound Engine Modified to fit without threading needed" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/System_Security_Project$Flask____init___py_.coverage" NAME="Flask (__init__.py) Coverage Results" MODIFIED="1659971826501" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/System_Security_Project$Flask____init___py_.coverage" NAME="Flask (__init__.py) Coverage Results" MODIFIED="1659972112847" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/System_Security_Project$System_Security_Project.coverage" NAME="System-Security-Project Coverage Results" MODIFIED="1659961960468" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/System_Security_Project$Currency.coverage" NAME="Currency Coverage Results" MODIFIED="1659970772026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
