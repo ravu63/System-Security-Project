@@ -954,9 +954,9 @@ def customer_change():
     prev = prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
-        rightnow=date.today()
-        day=rightnow-user.passwordChange
-        if day.days>5:
+        #rightnow=date.today()
+        #day=rightnow-user.passwordChange
+        #if day.days>5:
             prevCheck = False
             hashed_password = bcrypt.generate_password_hash(form.password.data)
             today = date.today()
@@ -1004,8 +1004,8 @@ def customer_change():
                         return redirect(url_for('dashboard'))
                     else:
                         return redirect(url_for('home'))
-        else:
-            flash(u'You are only allowed to change your password once every 5 days.')
+        #else:
+        #    flash(u'You are only allowed to change your password once every 5 days.')
 
     return render_template('customerChangePass.html', form=form)
 
