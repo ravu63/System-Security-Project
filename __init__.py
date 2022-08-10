@@ -419,7 +419,7 @@ def login():
                                             otp = random.randint(1111, 9999)
                                             session['emailotp'] = otp
                                             msg = Message('One Time Password', sender='radiantfinancenyp@gmail.com',
-                                                          recipients=[session['email']])
+                                                          recipients=[user.email])
                                             msg.body = 'here is your OTP:{}'.format(otp)
                                             mail.send(msg)
                                             return redirect(url_for('emailOTP'))
@@ -965,7 +965,7 @@ def customer_email(token):
     else:
         return redirect(url_for('home'))
     try:
-        email = s.loads(token, max_age=20)
+        email = s.loads(token, max_age=60)
     except SignatureExpired:
         return redirect(url_for('expired'))
     id = session['id']
