@@ -373,13 +373,13 @@ def login():
                         diff = current - before
                         hostname = socket.gethostname()
 
-                        if diff.days < 30:
+                        if diff.days < 90:
                             if bcrypt.check_password_hash(user.password, form.password.data):
                                 login_user(user)
                                 for i in range(len(attempts)):
                                     db.session.delete(attempts[i])
                                     db.session.commit()
-                                if diff.days >= 25:
+                                if diff.days >= 85:
                                     msg = Message('Password Expiring', sender='radiantfinancenyp@gmail.com',
                                                   recipients=[user.email])
                                     msg.body = 'Your password is expiring in {} days'.format(30 - diff.days)
