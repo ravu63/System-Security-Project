@@ -28,8 +28,8 @@ azure-cognitiveservices-vision-face==0.6.0
 opencv-python==4.6.0.66
 pytz==2022.1
 getmac==0.8.3
-
-
+pypiwin32==223
+pywin32==304
 msrest~=0.7.1
 cryptography~=37.0.2
 numpy~=1.23.0
