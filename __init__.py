@@ -852,52 +852,46 @@ def change_password():
     prev = prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
-        rightnow = date.today()
-        day = rightnow - user.passwordChange
-        if day.days > 5:
-            prevCheck = False
-            hashed_password = bcrypt.generate_password_hash(form.password.data)
-            today = date.today()
-            if len(prev) == 0:
-                prevCheck = True
-            else:
-                for i in range(len(prev)):
-                    if bcrypt.check_password_hash(prev[i].password, form.password.data):
-                        flash(u'Please do not use the old passwords.')
-                    else:
-                        prevCheck = True
-            if prevCheck == True:
-                if bcrypt.check_password_hash(user.password, form.password.data):
-                    flash(u'Your current password is the same as the new password you entered in.')
-                else:
-                    newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
-                    db.session.add(newPrev)
-                    db.session.commit()
-
-                    user.password = hashed_password
-                    user.passwordChange = today
-                    user.passAttempt = 0
-                    db.session.commit()
-
-                    for i in range(len(newdev)):
-                        db.session.delete(newdev[i])
-                        db.session.commit()
-
-                    hostname = socket.gethostname()
-                    new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
-                    db.session.add(new_dev)
-                    db.session.commit()
-
-                    msg = Message('Password Change', sender='radiantfinancenyp@gmail.com',
-                                  recipients=[email])
-                    msg.body = 'Your password has been successfully changed. If this was not you, please email the administrators.'
-                    mail.send(msg)
-
-                    session.pop('email', None)
-                    session.pop('otp', None)
-                    return redirect(url_for('login'))
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        today = date.today()
+        if len(prev) == 0:
+            prevCheck = True
         else:
-            flash(u'You are only allowed to change your password once every 5 days.')
+            for i in range(len(prev)):
+                if bcrypt.check_password_hash(prev[i].password, form.password.data):
+                    flash(u'Please do not use the old passwords.')
+                else:
+                    prevCheck = True
+        if prevCheck == True:
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                flash(u'Your current password is the same as the new password you entered in.')
+            else:
+                newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
+                db.session.add(newPrev)
+                db.session.commit()
+
+                user.password = hashed_password
+                user.passwordChange = today
+                user.passAttempt = 0
+                db.session.commit()
+
+                for i in range(len(newdev)):
+                    db.session.delete(newdev[i])
+                    db.session.commit()
+
+                hostname = socket.gethostname()
+                new_dev = checkNew(email=user.email, device_name=hostname, macaddr=gma())
+                db.session.add(new_dev)
+                db.session.commit()
+
+                msg = Message('Password Change', sender='radiantfinancenyp@gmail.com',
+                                  recipients=[email])
+                msg.body = 'Your password has been successfully changed. If this was not you, please email the administrators.'
+                mail.send(msg)
+
+                session.pop('email', None)
+                session.pop('otp', None)
+                return redirect(url_for('login'))
 
     return render_template('changePassword.html', form=form)
 
@@ -1063,8 +1057,8 @@ def customer_change():
                         return redirect(url_for('dashboard'))
                     else:
                         return redirect(url_for('home'))
-        #else:
-        #    flash(u'You are only allowed to change your password once every 5 days.')
+        else:
+            flash(u'You are only allowed to change your password once every 5 days.')
 
     return render_template('customerChangePass.html', form=form)
 
