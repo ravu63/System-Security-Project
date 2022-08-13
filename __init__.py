@@ -15,6 +15,7 @@ from wtforms import StringField, validators, PasswordField, SelectField, TextAre
 from wtforms.fields import EmailField, DateField
 from wtforms.validators import ValidationError
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import String, Integer, column
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_bcrypt import Bcrypt
 from captcha_generate import generate_captcha_image
@@ -29,6 +30,20 @@ import os
 from getmac import get_mac_address as gma
 import socket
 import win32com.client as wincl
+# Additional imports
+import binascii
+import uuid
+# AES import
+from cryptography.fernet import Fernet
+import cryptocode
+# additional SQLALchemy imports
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import Comparator
+from sqlalchemy.ext.hybrid import hybrid_property
+
+# end of imports
+
 
 speak = wincl.Dispatch("SAPI.SpVoice")
 
@@ -54,57 +69,275 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
+# Encryption/Decryption functions
+# key = b's3uc3MYVBhM_0Fln5k9F5Z6EXoN9LIMtYWRSjdspRhM='
+key = "a1b2c3key"
+
+
+# fernet = Fernet(key)
+
+def my_encrypt(plain_text):
+    encoded = cryptocode.encrypt(plain_text, key)
+    return encoded
+
+
+## And then to decode it:
+
+def my_decrypt(cipher_text):
+    # print("type: ",type(cipher_text))
+    decoded = cipher_text
+    if len(cipher_text) > 20:
+        decoded = cryptocode.decrypt(cipher_text, key)
+    return decoded
+
 
 # Start of database
+
 
 # Create table
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False)
-    gender = db.Column(db.String(1), nullable=False)
-    phone = db.Column(db.String(8), nullable=False)
+    _name = db.Column("name", db.String, nullable=False)
+    _gender = db.Column("gender", db.String, nullable=False)
+    _phone = db.Column("phone", db.String, nullable=False)
     birthdate = db.Column(db.Date, nullable=False)
-    email = db.Column(db.String(30), nullable=False)
+    _email = db.Column("email", db.String, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.Integer, nullable=False)
     passwordChange = db.Column(db.Date, nullable=False)
     passAttempt = (db.Column(db.Integer, nullable=False))
     TWOFAStatus = db.Column(db.String(30), nullable=False)
-    FUI = db.Column(db.String(300), nullable=True)
-    FUI_ID = db.Column(db.String(300), nullable=True)
+    _FUI = db.Column("FUI", db.String, nullable=True)
+    _FUI_ID = db.Column("FUI_ID", db.String, nullable=True)
     verified = db.Column(db.Integer, nullable=True)
+    """
+    Adding encryption decryption at class level to avoid
+    any disturbance in your code
+    """
+
+    @property
+    def name(self):
+        return my_decrypt(self._name)
+
+    @name.setter
+    def name(self, name):
+        self._name = my_encrypt(name)
+
+    @property
+    def gender(self):
+        return my_decrypt(self._gender)
+
+    @gender.setter
+    def gender(self, gender):
+        self._gender = my_encrypt(gender)
+
+    @property
+    def phone(self):
+        return my_decrypt(self._phone)
+
+    @phone.setter
+    def phone(self, phone):
+        self._phone = my_encrypt(phone)
+
+    @property
+    def email(self):
+        return my_decrypt(self._email)
+
+    @email.setter
+    def email(self, email):
+        self._email = my_encrypt(email)
+
+    @property
+    def FUI(self):
+        return my_decrypt(self._FUI)
+
+    @FUI.setter
+    def FUI(self, FUI):
+        self._FUI = my_encrypt(FUI)
+
+    @property
+    def FUI_ID(self):
+        return my_decrypt(self.FUI_ID)
+
+    @FUI_ID.setter
+    def FUI_ID(self, FUI_ID):
+        self._FUI_ID = my_encrypt(FUI_ID)
 
 
 class checkNew(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(30), nullable=False)
-    device_name = db.Column(db.String(30), nullable=False)
-    macaddr = db.Column(db.String(17), nullable=False)
+    _email = db.Column("email", db.String, nullable=False)
+    _device_name = db.Column("device_name", db.String, nullable=False)
+    _macaddr = db.Column("macaddr", db.String, nullable=False)
+
+    @property
+    def email(self):
+        return my_decrypt(self._email)
+
+    @email.setter
+    def email(self, email):
+        self._email = my_encrypt(email)
+
+    @property
+    def device_name(self):
+        return my_decrypt(self._device_name)
+
+    @device_name.setter
+    def device_name(self, device_name):
+        self._device_name = my_encrypt(device_name)
+
+    @property
+    def macaddr(self):
+        return my_decrypt(self._macaddr)
+
+    @macaddr.setter
+    def macaddr(self, macaddr):
+        self._macaddr = my_encrypt(macaddr)
 
 
 class prevPass(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(30), nullable=False)
+    _email = db.Column("email", db.String, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     dateChange = db.Column(db.Date, nullable=False)
+
+    @property
+    def email(self):
+        return my_decrypt(self._email)
+
+    @email.setter
+    def email(self, email):
+        self._email = my_encrypt(email)
 
 
 class Pawn(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(20), nullable=False)
-    last_name = db.Column(db.String(20), nullable=False)
-    nric = db.Column(db.String(9), nullable=False)
-    contact_number = db.Column(db.String(8), nullable=False)
-    email = db.Column(db.String(30), nullable=False)
-    address = db.Column(db.String(100), nullable=False)
-    item_name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(200), nullable=False)
-    category = db.Column(db.String(30), nullable=False)
-    ItemCondition = db.Column(db.String(30), nullable=False)
-    offer_price = db.Column(db.String(30), nullable=False)
-    period = db.Column(db.String(10), nullable=False)
-    sui = db.Column(db.String(10), nullable=False)
-    pawn_status = db.Column(db.String(10), nullable=False)
+    _first_name = db.Column("first_name", db.String, nullable=False)
+    _last_name = db.Column("last_name", db.String, nullable=False)
+    _nric = db.Column("nric", db.String, nullable=False)
+    _contact_number = db.Column("contact_number", db.String, nullable=False)
+    _email = db.Column("email", db.String, nullable=False)
+    _address = db.Column("address", db.String, nullable=False)
+    _item_name = db.Column("item_name", db.String, nullable=False)
+    _description = db.Column("description", db.String, nullable=False)
+    _category = db.Column("category", db.String, nullable=False)
+    _ItemCondition = db.Column("ItemCondition", db.String, nullable=False)
+    _offer_price = db.Column("offer_price", db.String, nullable=False)
+    _period = db.Column("period", db.String, nullable=False)
+    _sui = db.Column("sui", db.String, nullable=False)
+    _pawn_status = db.Column("pawn_status", db.String, nullable=False)
+
+    @property
+    def first_name(self):
+        return my_decrypt(self._first_name)
+
+    @first_name.setter
+    def last_name(self, first_name):
+        self._first_name = my_encrypt(first_name)
+
+    @property
+    def last_name(self):
+        return my_decrypt(self._last_name)
+
+    @last_name.setter
+    def last_name(self, last_name):
+        self._last_name = my_encrypt(last_name)
+
+    @property
+    def nric(self):
+        return my_decrypt(self._nric)
+
+    @nric.setter
+    def nric(self, nric):
+        self._nric = my_encrypt(nric)
+
+    @property
+    def contact_number(self):
+        return my_decrypt(self._contact_number)
+
+    @contact_number.setter
+    def contact_number(self, contact_number):
+        self._contact_number = my_encrypt(contact_number)
+
+    @property
+    def email(self):
+        return my_decrypt(self._email)
+
+    @email.setter
+    def email(self, email):
+        self._email = my_encrypt(email)
+
+    @property
+    def address(self):
+        return my_decrypt(self._address)
+
+    @address.setter
+    def address(self, address):
+        self._address = my_encrypt(address)
+
+    @property
+    def item_name(self):
+        return my_decrypt(self._item_name)
+
+    @item_name.setter
+    def item_name(self, item_name):
+        self._item_name = my_encrypt(item_name)
+
+    @property
+    def description(self):
+        return my_decrypt(self._description)
+
+    @description.setter
+    def description(self, description):
+        self._description = my_encrypt(description)
+
+    @property
+    def category(self):
+        return my_decrypt(self._category)
+
+    @category.setter
+    def category(self, category):
+        self._category = my_encrypt(category)
+
+    @property
+    def ItemCondition(self):
+        return my_decrypt(self._ItemCondition)
+
+    @ItemCondition.setter
+    def ItemCondition(self, ItemCondition):
+        self._ItemCondition = my_encrypt(ItemCondition)
+
+    @property
+    def offer_price(self):
+        return my_decrypt(self._offer_price)
+
+    @offer_price.setter
+    def offer_price(self, offer_price):
+        self._offer_price = my_encrypt(offer_price)
+
+    @property
+    def period(self):
+        return my_decrypt(self._period)
+
+    @period.setter
+    def period(self, period):
+        self._period = my_encrypt(period)
+
+    @property
+    def sui(self):
+        return my_decrypt(self._sui)
+
+    @sui.setter
+    def sui(self, sui):
+        self._sui = my_encrypt(sui)
+
+    @property
+    def pawn_status(self):
+        return my_decrypt(self._pawn_status)
+
+    @pawn_status.setter
+    def pawn_status(self, pawn_status):
+        self._pawn_status = my_encrypt(pawn_status)
 
 
 class Transaction(db.Model):
@@ -156,7 +389,15 @@ class CreateCustomerForm(FlaskForm):
             raise ValidationError("Phone number must not contain letters")
 
     def validate_email(self, email):
-        existing_user_email = User.query.filter_by(email=email.data).first()
+        # existing_user_email = User.query.filter_by(email=email.data).first()
+        existing_user_email_list = User.query.all()
+        existing_user_email = None
+        for eu in existing_user_email_list:
+            print("compare: ", str(eu.email) + " --> " + str(email.data))
+            if eu.email == email.data:
+                existing_user_email = eu
+                break
+
         if existing_user_email:
             raise ValidationError(flash(u'User exists'))
 
@@ -348,8 +589,19 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         current = date.today()
-        user = User.query.filter_by(email=form.email.data).first()
-        newdev = checkNew.query.filter_by(email=form.email.data).all()
+        # crypto changes
+        user = User.query.all()
+        for u in user:
+            if u.email == form.email.data:
+                user = u
+                break
+        # user = User.query.filter_by(email=my_encrypt(form.email.data)).first()
+        newdev = checkNew.query.all()
+        for ndev in newdev:
+            if ndev.email == form.email.data:
+                newdev = ndev
+                break
+        # newdev = checkNew.query.filter_by(email=my_encrypt(form.email.data)).all()
         if user:
             if user.verified == 1:
                 if user.passAttempt > 2:
@@ -520,6 +772,7 @@ def instruct():
     speak.Speak(
         "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Registration.The camera window will take some time to load up.Press Space to capture the image")
 
+
 def face_cancelled():
     speak.Speak("There is no face recognised.Please press the space bar to capture your face")
 
@@ -527,12 +780,15 @@ def face_cancelled():
 def face_successful():
     speak.Speak("Face Registration is done successfully!")
 
+
 def instruct_verify():
     speak.Speak(
         "Welcome to Radiant Finance!We will now proceed to 2 Factor-Authentication Facial Verification.The camera window will take some time to load up.Press Space to capture the image")
 
+
 def face_verified():
     speak.Speak("Face is verified.Now,you will be redirected back to the main page!")
+
 
 def face_not_verified():
     speak.Speak("Face does not match.Please try again!")
@@ -954,9 +1210,9 @@ def customer_change():
     prev = prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
-        rightnow=date.today()
-        day=rightnow-user.passwordChange
-        if day.days>5:
+        rightnow = date.today()
+        day = rightnow - user.passwordChange
+        if day.days > 5:
             prevCheck = False
             hashed_password = bcrypt.generate_password_hash(form.password.data)
             today = date.today()
@@ -1034,20 +1290,16 @@ def no_record():
 
 # Joshua
 
+# FREE TO EDIT STARTING FROM HERE
 # APP ROUTES FOR LOAN CREATE/RETRIEVE/UPDATE/DELETE
 @app.route('/Loan.html')
 def loans():
-    plans_dict = {}
-    db = shelve.open('Plans.db', 'r')
-    plans_dict = db['Plans']
-    db.close()
+    db = session.query(LoanData).all()
+    loans_list = []
+    for key in db:
+        loans_list.append(key)
 
-    plans_list = []
-    for key in plans_dict:
-        plan = plans_dict.get(key)
-        plans_list.append(plan)
-
-    return render_template('Loan.html', count=len(plans_list), plans_lists=plans_list)
+    return render_template('Loan.html', count=len(loans_list), loans_list=loans_list)
 
 
 @app.route('/createLoan.html', methods=['GET', 'POST'])
@@ -1138,28 +1390,28 @@ def create_plan():
 #     return render_template('retrievePlan.html', count=len(plans_list), plans_lists=plans_list)
 
 
-@app.route('/updatePlan.html/<int:id>/', methods=['GET', 'POST'])
-def update_plan(id):
-    update_plan_form = CreatePlanForm(request.form)
-    if request.method == 'POST' and update_plan_form.validate():
-        planentry = PlanData(Plan_Name=update_plan_form.Plan_name.data,
-                             Plan_descripion=update_plan_form.Plan_Des.data,
-                             Plan_interest=update_plan_form.Plan_interest.data)
-        db.session.add(planentry)
-        db.session.commit()
-        return redirect(url_for('retrieve_plan'))
-    else:
-        plans_dict = {}
-        db = shelve.open('Plans.db', 'r')
-        plans_dict = db['Plans']
-        db.close()
-
-        plan = plans_dict.get(id)
-        update_plan_form.Plan_name.data = plan.get_loan_plan_name()
-        update_plan_form.Plan_Des.data = plan.get_loan_plan_desc()
-        update_plan_form.Plan_interest.data = plan.get_loan_plan_int()
-
-        return render_template('updatePlan.html', form=update_plan_form)
+# @app.route('/updatePlan.html/<int:id>/', methods=['GET', 'POST'])
+# def update_plan(id):
+#     update_plan_form = CreatePlanForm(request.form)
+#     if request.method == 'POST' and update_plan_form.validate():
+#         planentry = PlanData(Plan_Name=update_plan_form.Plan_name.data,
+#                              Plan_descripion=update_plan_form.Plan_Des.data,
+#                              Plan_interest=update_plan_form.Plan_interest.data)
+#         db.session.add(planentry)
+#         db.session.commit()
+#         return redirect(url_for('retrieve_plan'))
+#     else:
+#         plans_dict = {}
+#         db = shelve.open('Plans.db', 'r')
+#         plans_dict = db['Plans']
+#         db.close()
+#
+#         plan = plans_dict.get(id)
+#         update_plan_form.Plan_name.data = plan.get_loan_plan_name()
+#         update_plan_form.Plan_Des.data = plan.get_loan_plan_desc()
+#         update_plan_form.Plan_interest.data = plan.get_loan_plan_int()
+#
+#         return render_template('updatePlan.html', form=update_plan_form)
 
 
 # @app.route('/deletePlan/<int:id>', methods=['POST'])
@@ -1201,7 +1453,8 @@ def update_plan(id):
 #
 #     return render_template('search.html', form=SearchLoanForm)
 
-# END OF LOAN INIT
+# END OF LOAN
+# EDIT POINT ENDS HERE
 
 
 # Start of Ravu
