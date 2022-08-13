@@ -1,0 +1,64 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Pawn- Retrieve Pawn{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<h1 class="display-4">Retrieve pawn</h1>
+
+<table class="w3-table w3-striped w3-border">
+<tr>
+  <td>
+    <form action="{{url_for('search_sui')}}"  method="POST">
+      <input type="submit" value="Search SUI" class="btn btn-danger">
+    </form>
+  </td>
+  <td>
+    <form action="{{url_for('filter_status')}}"  method="POST">
+      <input type="submit" value="Filter Status" class="btn btn-danger">
+    </form>
+  </td>
+</tr>
+  
+</table>
+<div>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>SUI</th>
+          <th>First Name</th>
+          <th>NRIC</th>
+          <th>Category of Item</th>
+          <th>Item Condition</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for pawn in pawn %}
+        <tr>
+        <td>{{ pawn.sui }}</td>
+        <td>{{ pawn.first_name }}</td>
+        <td>{{ pawn.nric }}</td>
+        <td>{{ pawn.category }}</td>
+        <td>{{ pawn.ItemCondition }}</td>
+        <td>{{ pawn.pawn_status }}</td>
+        <td>
+          <form action="{{url_for('view_pawn', id=pawn.id)}}" method="POST">
+            <input type="submit" value="View" class="btn btn-danger">
+          </form>
+        </td>
+        <td>
+          <form action="{{url_for('update_pawn', id=pawn.id)}}"  method="POST">
+            <input type="submit" value="Update" class="btn btn-danger">
+          </form>
+        </td>
+          <td>
+            <form action="{{url_for('delete_pawn', id=pawn.id)}}"  method="POST">
+              <input type="submit" value="Delete" class="btn btn-danger">
+            </form>
+          </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

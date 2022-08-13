@@ -1,0 +1,89 @@
+{% extends "baseMain.html" %}
+{% block title %}Pawn- Create Pawn{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %} 
+<h3 class="display-4">Pawn Creation</h3>
+<h4 class="display-4">Personal Particulars</h4>
+<form method="POST" action="">
+{{ form.hidden_tag() }}
+  <div class="form-group">
+      <h5>First Name</h5>
+    {{ form.first_name }}
+  </div>
+  <div class="form-group">
+      <h5>Last Name</h5>
+    {{ form.last_name }}
+  </div>
+  <div class="form-group">
+      <h5>NRIC</h5>
+    {{ form.nric }}
+  </div>
+  <div class="form-group">
+      <h5>Contact Number</h5>
+    {{ form.contactnumber }}
+  </div>
+  <div class="form-group">
+      <h5>Email</h5>
+    {{ form.email}}
+  </div>
+  <div id="prof">
+    <div class="form-group">
+        <h5>Address</h5>
+      {{ form.address }}
+    </div>
+    </div>
+  <h4 class="display-4">Details of Item to be Pawned</h4>
+  <div class="form-group">
+      <h5>Item Name</h5>
+    {{ form.itemname }}
+  </div>
+  <div id="prof">
+    <div class="form-group">
+        <h5>Description of Item</h5>
+      {{ form.Descriptionofitem }}
+    </div>
+    </div>
+  <div class="form-group">
+      <h5>Category</h5>
+    {{ form.Category }}
+  </div>
+  <div class="form-group">
+      <h5>Item Condition</h5>
+    {{ form.ItemCondition }}
+  </div>
+  <div class="form-group">
+      <h5>Offer Price</h5>
+    {{ form.offer_price }}
+  </div>
+  <div class="form-group">
+      <h5>Pawn Period</h5>
+    {{ form.pawn_period}}
+  </div>
+    <div id="show" style="display: none" class="form-group">
+    <input type="submit" value="Submit" class="btn btn-primary"/>
+</div>
+    <form action="#">
+        <div id="lift">
+        <img src="{{url_for('static', filename='cap.jpeg')}}"><br>
+        <label for="captcha_code">Enter the Captcha Code:</label><br>
+          <input type="text" id="captcha_code" name="fname"><br>
+          <input type="button" NAME="button" value="Verify" onclick="process(this.form)">
+            </div>
+    </form>
+
+</form>
+    <script>
+    function process (form) {
+        var correct_captcha = {{ captcha_text | tojson }};
+        var response_captcha = form.fname.value;
+        if (correct_captcha===response_captcha) {
+        alert('Correct Captcha!');
+        document.getElementById("lift").style.display = "none";
+        document.getElementById("show").style.display = "block";
+    }   else{
+        alert('Wrong! Try again!')
+    }
+    }
+    </script>
+{% endblock %}

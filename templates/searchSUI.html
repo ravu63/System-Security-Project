@@ -1,0 +1,15 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Pawn- Retrieve Pawn{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<h1 class="display-4">Search pawn</h1>
+<form method="POST" action="">
+{{ form.hidden_tag() }}
+    <div class="form-group">
+        <h4>SUI Code:</h4>
+        {{ form.SUI_CODE }}
+      </div>
+      <input type="submit" value="Submit" class="btn btn-primary"/>
+</form>
+{% endblock %}

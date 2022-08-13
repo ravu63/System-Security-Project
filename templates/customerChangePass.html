@@ -1,0 +1,56 @@
+{% extends "baseMain.html" %}
+{% block title %}Radiant Finance- Customer Change Password{% endblock %}
+{% block content %}
+<style>@import url('https://fonts.googleapis.com/css?family=Poppins');
+
+/* BASIC */
+
+
+
+
+</style>
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <!-- Tabs Titles -->
+    <h2>Change Password</h2>
+
+
+
+
+    <!-- Login Form -->
+    {% from "includes/_formHelper.html" import render_field %}
+    <form method="post">
+      <form method="POST" action="">
+    {{ form.hidden_tag() }}
+
+  <div class="form-group">
+    {{ render_field(form.password, class="form-control") }}
+  </div>
+
+  <div class="form-group">
+    {{ render_field(form.confirmpassword, class="form-control") }}
+  </div>
+          <div class="form-group">
+      <h6>date</h6>
+    {{ form.date }}
+  </div>
+        <div class="form-group">
+    {{ form.submit }}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+  </div>
+
+    </form>
+
+    <!-- Remind Passowrd -->
+
+  </div>
+</div>
+{% endblock %}

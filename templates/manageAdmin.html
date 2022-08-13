@@ -1,0 +1,54 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Radiant Finance - Manage Admin{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Manage Admin</h1>
+
+<a href="/createAdmin">Create Admin</a>
+<div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>BirthDate</th>
+        <th>gender</th>
+        <th>Phone Number</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for User in Users %}
+      {%if User.role==1%}
+        <tr>
+
+          <td>{{ User.name }}</td>
+          <td>{{ User.email }}</td>
+          <td>{{User.birthdate}}</td>
+          {% if User.gender == "F" %}
+            <td>Female</td>
+          {% elif User.gender == "M" %}
+            <td>Male</td>
+          {% endif %}
+          <td>{{User.phone}}</td>
+        <td><a href="/updateAdmin/{{User.id}}" class="btn btn-warning">Update</a></td>
+          <td>
+            <form action="{{url_for('delete_admin', id=User.id)}}" method="POST">
+
+          <form type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal_{{User.id}}">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
+
+
+            </form>
+          </td>
+
+        </tr>
+      {%endif%}
+      {% endfor %}
+
+    </tbody>
+  </table>
+</div>
+{% endblock %}

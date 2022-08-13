@@ -1,0 +1,71 @@
+{% extends "baseDashboard.html" %}
+{% block title %}Radiant Finance - Manage Customers{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Delete</h1>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Transaction</title>
+</head>
+    <header>Delete</header>
+<br>
+    <form action ="/deleteTransaction" method="POST">
+        <div class="select-box">
+            <select name="tId">
+            {% for trans in transactions %}
+            <option value = "{{trans}}" SELECTED>{{trans}}</option>
+            {% endfor %}
+        </select>
+        </div>
+<!--               <div class = "display-box">-->
+<!--            {% for obj in objects %}-->
+<!--            <p>{{obj}}</p>-->
+<!--        </div>-->
+<!--        {% endfor %}-->
+
+        {% if details %}
+        <div class ="detail-box">
+        <p>Details: {{ details }} </p>
+            <br>
+        {% endif %}
+            {% if deleted %}
+        <p>Transaction ID {{deleted}} successfully removed.</p>
+            {% endif %}
+        </div>
+        <button style="margin:5px;" name="check" type="submit" value="check">Check Transaction</button>
+        <button style="margin:5px;" name="delete" type="submit" value="delete">Delete Transaction</button>
+    </form>
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>State</th>
+          <th>Zip</th>
+          <th>Transaction ID</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in objects %}
+        <tr>
+
+          <td>{{ obj.getName() }}</td>
+          <td>{{ obj.getEmail() }}</td>
+          <td>{{obj.getAddress()}}</td>
+          <td>{{obj.getCity()}}</td>
+            <td>{{obj.getState()}}</td>
+            <td>{{obj.getZip()}}</td>
+            <td>{{obj.getTransactionID()}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</html>
+{% endblock %}
