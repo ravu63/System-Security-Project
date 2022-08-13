@@ -4,8 +4,5 @@
     <option name="show" value="ASK" />
     <option name="description" value="" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (project)" project-jdk-type="Python SDK" />
-  <component name="PyCharmProfessionalAdvertiser">
-    <option name="shown" value="true" />
-  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (System-Security-Project) (11)" project-jdk-type="Python SDK" />
 </project>
