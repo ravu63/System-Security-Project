@@ -30,10 +30,7 @@
   <div class="form-group">
     {{ render_field(form.confirmpassword, class="form-control") }}
   </div>
-          <div class="form-group">
-      <h6>date</h6>
-    {{ form.date }}
-  </div>
+
         <div class="form-group">
     {{ form.submit }}
         {% with messages = get_flashed_messages(with_categories=true) %}

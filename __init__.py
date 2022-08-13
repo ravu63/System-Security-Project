@@ -194,7 +194,6 @@ class UpdateCustomerForm2(FlaskForm):
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
                                           validators.EqualTo('confirmpassword', message='Error:Passwords must match')])
     confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
-    date=DateField('Birthdate', format='%Y-%m-%d')
     submit = SubmitField('Submit')
 
 
@@ -473,7 +472,7 @@ def signup():
         today = date.today()
         new_user = User(name=form.name.data, gender=form.gender.data, phone=form.phone.data,
                         birthdate=form.birthdate.data, email=form.email.data, password=hashed_password, role=0,
-                        passwordChange=form.birthdate.data, passAttempt=0, TWOFAStatus='None', FUI="None", FUI_ID="None", verified=0)
+                        passwordChange=today, passAttempt=0, TWOFAStatus='None', FUI="None", FUI_ID="None", verified=0)
         db.session.add(new_user)
         db.session.commit()
 
