@@ -435,6 +435,7 @@ class UpdateCustomerForm2(FlaskForm):
     password = PasswordField('Password', [validators.Length(min=10, max=150), validators.DataRequired(),
                                           validators.EqualTo('confirmpassword', message='Error:Passwords must match')])
     confirmpassword = PasswordField('Confirm Password', [validators.DataRequired()])
+    date = DateField('Birthdate', format='%Y-%m-%d')
     submit = SubmitField('Submit')
 
 
@@ -1108,6 +1109,9 @@ def OTP():
     return render_template('OTP.html', form=login_form)
 
 
+
+
+
 @app.route('/changePassword', methods=['POST', 'GET'])
 def change_password():
     form = UpdateCustomerForm2()
@@ -1266,7 +1270,7 @@ def customer_change():
     else:
         redirect(url_for('home'))
     id = session['id']
-    form = UpdateCustomerForm2()
+        form = UpdateCustomerForm2()
     user = User.query.get(id)
     email = user.email
     prev = prevPass.query.filter_by(email=email).all()
@@ -1303,7 +1307,7 @@ def customer_change():
                 if bcrypt.check_password_hash(user.password, form.password.data):
                     flash(u'Your current password is the same as the new password you entered in.')
                 else:
-                    newPrev = prevPass(email=user.email, password=user.password, dateChange=today)
+                    newPrev = prevPass(email=user.email, password=user.password, dateChange=form.date.data)
                     db.session.add(newPrev)
                     db.session.commit()
 
