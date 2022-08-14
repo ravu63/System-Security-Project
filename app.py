@@ -80,6 +80,7 @@ class checkNew(db.Model):
     device_name = db.Column(db.String(30), nullable=False)
     macaddr = db.Column(db.String(17), nullable=False)
 
+
 class ChangeQues(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), nullable=False)
@@ -89,16 +90,17 @@ class ChangeQues(db.Model):
     pri_sch = db.Column(db.String(100), nullable=False)
     food = db.Column(db.String(100), nullable=False)
 
+
 class prevPass(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     dateChange = db.Column(db.Date, nullable=False)
 
+
 class attempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mac = db.Column(db.String(17), nullable=False)
-
 
 
 class Pawn(db.Model):
@@ -291,6 +293,7 @@ class TransactionForm(FlaskForm):
 
     # def validate_email(self,email):
 
+
 class ChangeQuesform(FlaskForm):
     city = StringField('In what city were you born?', [validators.Length(min=3, max=150), validators.DataRequired()])
     pet = StringField('What is the name of your favorite pet?',
@@ -371,7 +374,7 @@ def login():
         current = date.today()
         user = User.query.filter_by(email=form.email.data).first()
         newdev = checkNew.query.filter_by(email=form.email.data).all()
-        attempts= attempt.query.filter_by(mac=gma()).all()
+        attempts = attempt.query.filter_by(mac=gma()).all()
         if user:
             if user.verified == 1:
                 if len(attempts) >= 6:
@@ -380,9 +383,9 @@ def login():
                 else:
                     if user.passAttempt > 2:
                         flash(u'Too many failed password attepmts. Please reset password.')
-                        msg=Message('Account Lock', sender='radiantfinancenyp@gmail.com',
-                                    recipients=[user.email])
-                        msg.body='Your account has been locked out due to too many failed login attempts. Please reset your password.'
+                        msg = Message('Account Lock', sender='radiantfinancenyp@gmail.com',
+                                      recipients=[user.email])
+                        msg.body = 'Your account has been locked out due to too many failed login attempts. Please reset your password.'
                         mail.send(msg)
                     else:
                         before = user.passwordChange
@@ -467,7 +470,7 @@ def login():
                                 user.passAttempt += 1
                                 db.session.commit()
 
-                                new_attempt=attempt(mac=gma())
+                                new_attempt = attempt(mac=gma())
                                 db.session.add(new_attempt)
                                 db.session.commit()
                                 flash(u'Invalid Email or Password')
@@ -554,24 +557,28 @@ except OSError as error:
 
 def instruct():
     speak.Speak(
-        "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Registration.The camera window will take some time to load up.Press Space to capture the image")
+        "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Registration. The camera window will take some time to load up.Press Space to capture the image")
+
 
 def face_cancelled():
-    speak.Speak("There is no face recognised.Please press the space bar to capture your face")
+    speak.Speak("There is no face recognised. Please press the space bar to capture your face")
 
 
 def face_successful():
     speak.Speak("Face Registration is done successfully!")
 
+
 def instruct_verify():
     speak.Speak(
-        "Welcome to Radiant Finance!We will now proceed to 2 Factor-Authentication Facial Verification.The camera window will take some time to load up.Press Space to capture the image")
+        "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Verification. The camera window will take some time to load up.Press Space to capture the image")
+
 
 def face_verified():
-    speak.Speak("Face is verified.Now,you will be redirected back to the main page!")
+    speak.Speak("Face is verified. Now,you will be redirected back to the main page!")
+
 
 def face_not_verified():
-    speak.Speak("Face does not match.Please try again!")
+    speak.Speak("Face does not match. Please try again!")
 
 
 @app.route('/registerFace', methods=['GET', 'POST'])
@@ -666,6 +673,7 @@ def verifyFace(id):
                     return redirect(url_for('main'))
                 else:
                     os.remove(p)
+                    face_not_verified()
                     continue
             else:
                 face_cancelled()
@@ -758,6 +766,7 @@ def manage_admin():
         return redirect(url_for('main'))
     return render_template('manageAdmin.html', Users=User.query.all())
 
+
 @app.route('/manageAttempts', methods=['GET', 'POST'])
 @login_required
 def manage_attempt():
@@ -767,6 +776,7 @@ def manage_attempt():
     else:
         return redirect(url_for('main'))
     return render_template('manageAttempt.html', Users=attempt.query.all())
+
 
 @app.route('/updateAdmin/<id>/', methods=['GET', 'POST'])
 @login_required
@@ -819,6 +829,7 @@ def delete_admin(id):
 
     return redirect(url_for('manage_admin'))
 
+
 @app.route('/deleteAttempt/', methods=['POST'])
 @login_required
 def delete_attempt():
@@ -828,11 +839,12 @@ def delete_attempt():
     else:
         return redirect(url_for('main'))
 
-    attempts= attempt.query.filter_by(mac=gma()).all()
+    attempts = attempt.query.filter_by(mac=gma()).all()
     for i in range(len(attempts)):
         db.session.delete(attempts[i])
         db.session.commit()
         return redirect(url_for('manage_attempt'))
+
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
@@ -937,7 +949,7 @@ def change_password():
                 db.session.commit()
 
                 msg = Message('Password Change', sender='radiantfinancenyp@gmail.com',
-                                  recipients=[email])
+                              recipients=[email])
                 msg.body = 'Your password has been successfully changed. If this was not you, please email the administrators.'
                 mail.send(msg)
 
@@ -1053,9 +1065,9 @@ def customer_change():
     prev = prevPass.query.filter_by(email=email).all()
     newdev = checkNew.query.filter_by(email=email).all()
     if request.method == 'POST' and form.validate_on_submit():
-        rightnow=date.today()
-        day=rightnow-user.passwordChange
-        if day.days>5:
+        rightnow = date.today()
+        day = rightnow - user.passwordChange
+        if day.days > 5:
             prevCheck = False
             hashed_password = bcrypt.generate_password_hash(form.password.data)
             today = date.today()
@@ -1073,7 +1085,7 @@ def customer_change():
                 for i in range(len(prev)):
                     if bcrypt.check_password_hash(prev[i].password, form.password.data):
                         flash(u'Please do not use the old passwords.')
-                        prevCheck=False
+                        prevCheck = False
                         break
                     else:
                         prevCheck = True
