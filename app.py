@@ -70,6 +70,7 @@ class User(db.Model, UserMixin):
     TWOFAStatus = db.Column(db.String(30), nullable=False)
     FUI = db.Column(db.String(300), nullable=True)
     FUI_ID = db.Column(db.String(300), nullable=True)
+    SUI_ID = db.Column(db.String(300), nullable=True)
     verified = db.Column(db.Integer, nullable=True)
 
 
@@ -79,6 +80,14 @@ class checkNew(db.Model):
     device_name = db.Column(db.String(30), nullable=False)
     macaddr = db.Column(db.String(17), nullable=False)
 
+class ChangeQues(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), nullable=False)
+    city = db.Column(db.String(100), nullable=False)
+    pet = db.Column(db.String(100), nullable=False)
+    sec_sch = db.Column(db.String(100), nullable=False)
+    pri_sch = db.Column(db.String(100), nullable=False)
+    food = db.Column(db.String(100), nullable=False)
 
 class prevPass(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -281,6 +290,16 @@ class TransactionForm(FlaskForm):
             raise ValidationError("Postal Code must not contain letters")
 
     # def validate_email(self,email):
+
+class ChangeQuesform(FlaskForm):
+    city = StringField('In what city were you born?', [validators.Length(min=3, max=150), validators.DataRequired()])
+    pet = StringField('What is the name of your favorite pet?',
+                      [validators.Length(min=3, max=150), validators.DataRequired()])
+    sec_sch = StringField('What Secondary School did you attend?',
+                          [validators.Length(min=3, max=150), validators.DataRequired()])
+    pri_sch = StringField('What Primary School did you attend?',
+                          [validators.Length(min=3, max=150), validators.DataRequired()])
+    food = StringField('What is your favourite food?', [validators.Length(min=3, max=150), validators.DataRequired()])
 
 
 # End of Chest
@@ -525,7 +544,6 @@ def emailOTP():
 
 # end of chestion email stuff
 
-# Ravu Face Verification
 
 # make shots directory to save pics
 try:
@@ -658,7 +676,44 @@ def verifyFace(id):
     return render_template('verifyFace.html')
 
 
-# End of Ravu Face shit
+@app.route('/SecurityQuestion', methods=['GET', 'POST'])
+@login_required
+def create_Security_questions():
+    id = session['id']
+    user = User.query.filter_by(id=id).first()
+    email = user.email
+    if user.SUI_ID == '1':
+        return render_template("registeredSecQues.html")
+    else:
+        form = ChangeQuesform()
+        if form.validate_on_submit():
+            new_record = ChangeQues(city=form.city.data, pet=form.pet.data, sec_sch=form.sec_sch.data,
+                                    pri_sch=form.pri_sch.data, food=form.food.data, email=email)
+            db.session.add(new_record)
+            db.session.commit()
+            row_update = User.query.filter_by(id=user.id).update(dict(SUI_ID=1))
+            db.session.commit()
+            return redirect(url_for('main'))
+    return render_template('securityques.html', form=form)
+
+
+@app.route('/checkPoint', methods=['GET', 'POST'])
+@login_required
+def checkpoint():
+    id = session['id']
+    user = User.query.filter_by(id=id).first()
+    email = user.email
+    if user.SUI_ID == '1':
+        form = ChangeQuesform()
+        sev = ChangeQues.query.filter_by(email=email).first()
+        if request.method == 'POST':
+            if sev.city == form.city.data and sev.pet == form.pet.data and sev.sec_sch == form.sec_sch.data and sev.pri_sch == form.pri_sch.data and sev.food == form.food.data:
+                return redirect(url_for('customer_change'))
+            else:
+                return render_template('ErrorSecQues.html')
+        return render_template('checkpoint.html', form=form)
+    else:
+        return redirect(url_for('customer_change'))
 
 
 @app.route('/createAdmin', methods=['GET', 'POST'])
@@ -983,7 +1038,7 @@ def expired():
     return render_template('expired.html')
 
 
-@app.route('/customerChangePass', methods=['GET', 'POST'])
+@app.route('/checkpoint/customerChangePass', methods=['GET', 'POST'])
 @login_required
 def customer_change():
     role = session['role']
