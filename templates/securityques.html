@@ -1,0 +1,31 @@
+{% extends "baseMain.html" %}
+{% block title %}Security{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<h4 class="display-4">Set-Up Security Questions</h4>
+<form method="POST" action="">
+{{ form.hidden_tag() }}
+<div class="form-group">
+      <h5>In what city were you born?</h5>
+    {{ form.city }}
+  </div>
+<div class="form-group">
+      <h5>What is the name of your favorite pet?</h5>
+    {{ form.pet }}
+  </div>
+<div class="form-group">
+      <h5>What Secondary School did you attend?</h5>
+    {{ form.sec_sch }}
+  </div>
+<div class="form-group">
+      <h5>What Primary School did you attend?</h5>
+    {{ form.pri_sch }}
+  </div>
+<div class="form-group">
+      <h5>What is your favourite food?</h5>
+    {{ form.food }}
+  </div>
+<input type="submit" value="Submit" class="btn btn-primary"/>
+</form>
+{% endblock %}
