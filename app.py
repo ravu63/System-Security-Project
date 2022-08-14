@@ -3,13 +3,11 @@ import datetime
 import string
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, make_response
 from flask_mail import Mail, Message
-from Feedback1 import Feedback1
 from Forms import OTPform, \
     CreateLoanForm, CreatePlanForm, PawnCreation, \
     PawnStatus, \
-    PawnRetrieval, SearchSUI, filterStatus, FeedbackForm1
+    PawnRetrieval, SearchSUI, filterStatus
 from flask_wtf import FlaskForm
-import threading
 from wtforms import StringField, validators, PasswordField, SelectField, TextAreaField, \
     SubmitField
 from wtforms.fields import EmailField, DateField
