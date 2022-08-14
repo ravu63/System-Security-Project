@@ -177,7 +177,6 @@ class UpdateCustomerForm(FlaskForm):
     gender = SelectField('Gender', [validators.DataRequired()], choices=[('F', 'Female'), ('M', 'Male')], default='')
     phone = StringField('Phone', [validators.Length(min=8, max=8), validators.DataRequired()])
     birthdate = DateField('Birthdate', format='%Y-%m-%d')
-    email = EmailField('Email', [validators.Email(), validators.DataRequired()])
     submit = SubmitField('Update')
 
     def validate_phone(self, phone):
