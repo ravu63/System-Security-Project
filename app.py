@@ -898,7 +898,7 @@ def OTP():
             utc = pytz.UTC
             now = utc.localize(now)
             current = (now - then).total_seconds()
-            if current < 180:
+            if current < 60:
                 return redirect(url_for('change_password', id=id))
             else:
                 flash(u'OTP has expired please retry again.')
