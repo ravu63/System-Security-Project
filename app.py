@@ -475,10 +475,10 @@ def login():
                             flash(u'Invalid Email or Password')
                     else:
                         flash(u'Password has expired. Please change password.')
+            else:
+                flash(u'Please verify your email before continuing')
         else:
-            flash(u'Please verify your email before continuing')
-    else:
-        flash(u'Invalid Email or Password')
+            flash(u'Invalid Email or Password')
     return render_template('login.html', form=form)
 
 
