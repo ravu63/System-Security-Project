@@ -48,7 +48,7 @@ app.config['MAIL_DEBUG'] = True
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
-app.config['MAIL_PASSWORD'] = "xepjuxdlrsmpcnxk"
+app.config['MAIL_PASSWORD'] = "laenfyxylchbycvj"
 mail = Mail(app)
 bcrypt = Bcrypt(app)
 
