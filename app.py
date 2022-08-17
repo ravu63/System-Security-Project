@@ -101,9 +101,7 @@ class prevPass(db.Model):
     dateChange = db.Column(db.Date, nullable=False)
 
 
-class attempt(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    mac = db.Column(db.String(17), nullable=False)
+
 
 
 class Pawn(db.Model):
@@ -469,9 +467,6 @@ def login():
                             user.passAttempt += 1
                             db.session.commit()
 
-                            new_attempt = attempt(mac=gma())
-                            db.session.add(new_attempt)
-                            db.session.commit()
                             flash(u'Invalid Email or Password')
                     else:
                         flash(u'Password has expired. Please change password.')
