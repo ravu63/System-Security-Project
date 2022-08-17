@@ -548,23 +548,12 @@ try:
 except OSError as error:
     pass
 
-
-def instruct():
-    speak.Speak(
-        "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Registration. The camera window will take some time to load up.Press Space to capture the image")
-
-
 def face_cancelled():
     speak.Speak("There is no face recognised. Please press the space bar to capture your face")
 
 
 def face_successful():
     speak.Speak("Face Registration is done successfully!")
-
-
-def instruct_verify():
-    speak.Speak(
-        "Welcome to Radiant Finance! We will now proceed to 2 Factor-Authentication Facial Verification. The camera window will take some time to load up.Press Space to capture the image")
 
 
 def face_verified():
@@ -578,7 +567,6 @@ def face_not_verified():
 @app.route('/registerFace', methods=['GET', 'POST'])
 def registerFace():
     camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-    instruct()
     while True:
         ret, frame = camera.read()
         frame = cv2.putText(cv2.flip(frame, 1), "Press Space to Capture!", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1,
@@ -628,7 +616,6 @@ def verifyFace(id):
     mock_try = User.query.get(id)
     mock = mock_try.FUI_ID
     camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-    instruct_verify()
     while True:
         ret, frame = camera.read()
         frame = cv2.putText(cv2.flip(frame, 1), "Press Space to Capture!", (0, 25), cv2.FONT_HERSHEY_SIMPLEX, 1,

@@ -32,8 +32,3 @@ pypiwin32==223
 pywin32==304
 msrest~=0.7.1
 cryptography~=37.0.2
-numpy~=1.23.0
-pandas~=1.4.3
-seaborn~=0.11.2
-scikit-learn~=1.1.1
-cryptocode~=0.1
