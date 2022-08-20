@@ -33,11 +33,11 @@ from flask import session, app
 
 speak = wincl.Dispatch("SAPI.SpVoice")
 
-KEY = "8341c4d3ee5842ea9ab5a2f9192a020a"
-ENDPOINT = "https://radiant63.cognitiveservices.azure.com/"
+KEY = "[YOUR AZURE FACE API KEY]"
+ENDPOINT = "[YOUR AZURE FACE API ENDPOINT]"
 face_client = FaceClient(ENDPOINT, CognitiveServicesCredentials(KEY))
 blob_service_client = BlobServiceClient.from_connection_string(
-    "DefaultEndpointsProtocol=https;AccountName=ravu63;AccountKey=Rb3XX8PGQswVKFQPNYGjh+d/1+s98EOyNvltfbuoL89v0c7HcTGa7bPykBuaD8A0FkEVWuNokhhn+AStJVn5+w==;EndpointSuffix=core.windows.net")
+    "[YOUR AZURE BLOB STORAGE CONNECTION STRING]")
 
 s = URLSafeTimedSerializer('ThisIsASecret!')
 app = Flask(__name__)
@@ -47,8 +47,8 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_DEBUG'] = True
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USERNAME'] = "radiantfinancenyp@gmail.com"
-app.config['MAIL_PASSWORD'] = "laenfyxylchbycvj"
+app.config['MAIL_USERNAME'] = "[YOUR EMAIL ACCOUNT USERNAME]"
+app.config['MAIL_PASSWORD'] = "[YOUR EMAIL ACCOUNT PASSWORD]"
 mail = Mail(app)
 bcrypt = Bcrypt(app)
 
