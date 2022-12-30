@@ -583,7 +583,7 @@ def registerFace():
             blob_client = blob_service_client.get_blob_client(container='radiant', blob=p)
             with open(p, "rb") as data:
                 blob_client.upload_blob(data)
-            url = "https://ravu63.blob.core.windows.net/radiant/" + p
+            url = "[YOUR URL]" + p
             image_url = url
             image_url_name = os.path.basename(url)
             see_face = face_client.face.detect_with_url(url=image_url, detection_model='detection_03',
@@ -632,7 +632,7 @@ def verifyFace(id):
             blob_client = blob_service_client.get_blob_client(container='verification', blob=p)
             with open(p, "rb") as data:
                 blob_client.upload_blob(data)
-            url = "https://ravu63.blob.core.windows.net/verification/" + p
+            url = "[YOUR URL]" + p
             image_url = url
             image_url_name = os.path.basename(url)
             see_face = face_client.face.detect_with_url(url=image_url, detection_model='detection_03',
